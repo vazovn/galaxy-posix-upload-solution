@@ -1,0 +1,49 @@
+---
+# install the necessary dependencies
+- name: Install Dependencies
+  yum: 
+    name: 
+       - bison.x86_64
+       - ragel-devel.x86_64
+       - ragel.x86_64
+    state: present
+
+
+- name: Copy slurm-drmaa source
+  copy:
+    src: "{{ role_path }}/files/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz"
+    dest: /tmp/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz
+    mode: ugo+rw
+    owner: root
+    group: root
+    
+- name: Copy slurm-drmaa conf
+  copy:
+    src: "{{ role_path }}/files/slurm_drmaa.conf"
+    dest: /etc/slurm_drmaa.conf
+    mode: ugo+rwx
+    owner: root
+    group: root
+
+- name: unzip slurm-drmaa
+  unarchive:
+      src: "/tmp/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz"
+      dest: "/tmp"
+      owner: root
+      remote_src: yes
+      mode: 01777
+    
+- name: Running ./configure for slurm-drmaa
+  shell:  ./configure --with-slurm-inc=/usr/include --with-slurm-lib=/usr/lib64/ --prefix=/srv/drmaa/ --enable-debug
+  args:
+    chdir: "/tmp/slurm-drmaa-{{ slurm_drmaa_version }}"
+  environment:
+    LD_LIBRARY_PATH: '$LD_LIBRARY_PATH:/usr/lib64'
+    CXXFLAGS: "-g -00"
+    
+
+- name: Running "make" for slurm-drmaa
+  command: 'make chdir=/tmp/slurm-drmaa-{{ slurm_drmaa_version }}'
+
+- name: Running "make install" for slurm-drmaa
+  command: 'make install chdir=/tmp/slurm-drmaa-{{ slurm_drmaa_version }}'

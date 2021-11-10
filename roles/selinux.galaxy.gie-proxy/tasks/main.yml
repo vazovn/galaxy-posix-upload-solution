@@ -1,0 +1,60 @@
+# so, first there is the use of tcp ports
+# in the terminal you can give it access with "setsebool -P nis_enabled 1"
+# THIS is done below here
+
+######## DEGUG WITH ##########
+## sealert -l "*" | less #####
+##############################
+
+# equivalent of
+# 1) semanage fcontext -a -t var_t "/srv/galaxy(/.*)?"
+# 2) restorecon -Rv /srv/galaxy
+
+- name: Set selinux-fcontext for /srv/gie-proxy
+  sefcontext:
+    target: '/srv/gie-proxy(/.*)?'
+    setype: var_t
+    state: present
+
+# Run in case the above commands fail
+- name: Run restorecon -Rv just in case if sefcontext fails
+  command: "{{ item }}"
+  with_items:
+    - "restorecon -Rv /srv/gie-proxy"
+
+# in ansible that will be something like this, then you will kind off have a sort of documentation on what is done as well, so I recomend putting it ansible (you can do it in the terminal as well).
+- name: Set network persmissions for galaxy to use tcp-ports
+  seboolean:
+    name: nis_enabled
+    state: yes
+    persistent: yes
+    
+- name: Set mmap-permission for galaxy on files
+  seboolean:
+    name: domain_can_mmap_files
+    state: yes
+    persistent: yes
+
+# Then we need to give init_t access to var_t and the postgres-socket, you can do these commands directly in the terminal as well
+- name:  "Create selinux dir"
+  file:  dest=/tmp/selinux state=directory
+
+- name:  "Copy selinux files"
+  copy:  src="{{ role_path }}/files/galaxy_selinux_gie.te" dest=/tmp/selinux
+
+- name: "Check modules"
+  shell: "checkmodule -M -m -o /tmp/selinux/galaxy_selinux_gie.mod /tmp/selinux/galaxy_selinux_gie.te"
+
+- name: "Package modules"
+  shell: "semodule_package -o /tmp/selinux/galaxy_selinux_gie.pp -m /tmp/selinux/galaxy_selinux_gie.mod"
+
+- name: "Install modules"
+  shell: "semodule -i /tmp/selinux/galaxy_selinux_gie.pp"
+  
+# Create a policy package allowing "node" service to access the container on its port
+- name: "Allow the node service to access the container" 
+  shell: "ausearch -c 'node' --raw | audit2allow -M my-node"
+  
+# Make this policy active
+- name: "Make this policy active"
+  shell: "semodule -X 300 -i /srv/gie-proxy/proxy/my-node.pp"

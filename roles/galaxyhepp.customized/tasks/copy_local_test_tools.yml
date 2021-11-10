@@ -1,0 +1,17 @@
+---
+
+- name: Creates directory for local test tools
+  file:
+    path: "{{ galaxy_local_tools_dir }}/test_tools"
+    state: directory
+    owner: galaxy
+    group: galaxy
+    mode: 0775
+    recurse: yes
+
+- name: Copy local test tool wrappers
+  copy:
+    src: "{{ galaxy_local_tools_src_dir }}/test_tools/{{ item }}"
+    dest: "{{ galaxy_local_tools_dir }}/test_tools/{{ item }}"
+  with_items: "{{ galaxy_local_test_tools | default([]) }}"
+  when: galaxy_local_test_tools is defined

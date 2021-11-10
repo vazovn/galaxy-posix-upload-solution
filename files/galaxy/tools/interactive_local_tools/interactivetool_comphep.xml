@@ -1,0 +1,30 @@
+<tool id="interactive_tool_comphep" tool_type="interactive" name="COMPHEP" version="1.0.0">
+    <requirements>
+      <container type="docker">maikenp/comphep-ubuntu-gui:latest</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="COMPHEP" requires_domain="True">
+            <port>5800</port>
+        </entry_point>
+    </entry_points>
+    
+    <command detect_errors="exit_code">
+    <![CDATA[
+        mkdir output &&
+	cd - &&
+        /init ;
+	cp /opt/comphep_wd/results/* output/ | true &&
+	sleep 2
+    ]]>
+    </command>
+
+    <outputs>
+
+      <collection name="outputs" type="list" label="COMPHEP outputs">
+	<discover_datasets pattern="__name_and_ext__"   recurse="true" visible="false" directory="output"/>
+	<discover_datasets pattern="__designation__"   recurse="true" visible="false" directory="output"/>
+      </collection>
+      
+    </outputs>
+    
+</tool>

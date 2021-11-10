@@ -1,0 +1,33 @@
+---
+# - name: Insert New block in tool_shed
+#   lineinfile:
+#     path: "{{ galaxy_server_dir }}/config/tool_sheds_conf.xml.sample"
+#     backup: yes
+#     insertbefore: '^</tool_sheds>'
+#     line: '      <tool_shed name="NELS Tool Shed" url="https://galaxy-ntnu.bioinfo.no/toolshed_nels/"/>'
+
+# - name: Copy Welcome Page for immuneML
+#   copy:
+#     src: ./roles/centos.zpath/files/welcome_immuneml.html
+#     dest: /srv/galaxy/server/static/
+
+# - name: Copy shed_tool_conf xml with Get Data 
+#   copy:
+#     src: ./roles/centos.zpath/files/get_data.xml
+#     dest: /srv/galaxy/server/config/tool_conf.xml  
+#   notify:
+#     - restart galaxy
+
+- name: Copy Welcome Page for Zpath
+  copy:
+    src: "{{ role_path }}/files/welcome_zpath.html"
+    dest: /srv/galaxy/server/static/welcome.html
+
+- name: Copy shed_tool_conf xml with Get Data 
+  copy:
+    src: "{{ role_path }}/files/get_data.xml"
+    dest: /srv/galaxy/var/config/shed_tool_conf.xml
+  notify:
+    - restart galaxy
+
+    

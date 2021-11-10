@@ -1,0 +1,140 @@
+<tool id="interactive_tool_jupyter_notebook_fys5555" tool_type="interactive" name="Notebooks for FYS5555" version="0.1">
+  <requirements>
+    <!--<container type="docker">maikenp/docker-jupyter-notebook-fys5555:latest</container>-->
+   <container type="docker">maikenp/docker-jupyter-notebook-fys5555:eb</container>
+  </requirements>
+    <entry_points>
+        <entry_point name="Jupyter Interactive Tool" requires_domain="True">
+            <port>8888</port>
+            <url>ipython/lab</url>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
+        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key" />
+    </environment_variables>
+    <command detect_errors="aggressive"><![CDATA[
+    #import re
+    export GALAXY_WORKING_DIR=`pwd` &&
+    mkdir -p ./jupyter/ &&
+    mkdir -p ./jupyter/outputs/ &&
+    mkdir -p ./jupyter/data &&
+    
+    ## change into the directory where the notebooks are located
+    cd ./jupyter/ &&
+    export HOME=/home/jovyan/ &&
+    export PATH=/home/jovyan/.local/bin:\$PATH &&
+    
+    cp -r /storage/shared/software/Input ./ && 
+    jupyter trust ./Input/OpenDataPandaFramework13TeV.ipynb  &&
+
+    cp -r /storage/shared/software/Notebooks ./ &&
+    jupyter trust ./Notebooks/ATLASOpenData/13TeV/*.ipynb &&
+    jupyter trust ./Notebooks/Polarquest2018/*.ipynb &&
+    jupyter trust ./Notebooks/Statistics/*.ipynb &&
+    jupyter trust ./Notebooks/SUSYPhenoPlot/*.ipynb &&
+
+    cp -r /storage/shared/software/Scripts ./ &&
+    . /opt/software/lmod/lmod/init/profile && 
+    module --ignore_cache load DataAnalysis/1.0.0 &&
+
+    #if $mode.mode_select == 'select':
+	
+	#if $mode.notebook_choice.notebook == 'DiLep':
+	    #set $notebookName = 'DileptonAnalysis.ipynb'
+            #set $notebookDir = 'ATLASOpenData/13TeV'
+	#else if $mode.notebook_choice.notebook == 'DiLepRFrame':
+            #set $notebookName = 'DileptonAnalysisRDataFrame.ipynb'
+            #set $notebookDir = 'ATLASOpenData/13TeV'
+	#else if $mode.notebook_choice.notebook == 'ML':
+	    #set $notebookName = 'MLAnalysisExample.ipynb'
+            #set $notebookDir = 'ATLASOpenData/13TeV'
+	#else if $mode.notebook_choice.notebook == 'MakeTrain':
+	    #set $notebookName = 'MakeTrainTestSamples.ipynb'
+            #set $notebookDir = 'ATLASOpenData/13TeV'
+	#else if $mode.notebook_choice.notebook == 'NtupToHdf5':
+	    #set $notebookName = 'ConvertNtupToHdf5.ipynb'
+            #set $notebookDir = 'ATLASOpenData/13TeV'
+	#else if $mode.notebook_choice.notebook == 'Statistics':
+	    #set $notebookName = 'statisticsNotebook.ipynb'
+	    #set $notebookDir = 'Statistics'
+        #end if
+
+	echo 'Notebook selected: $notebookName' &&
+	cp /storage/shared/software/Notebooks/$notebookDir/$notebookName ./ &&
+        #if $notebookDir == 'ATLASOpenData/13TeV' or $notebookDir == 'SUSYPhenoPlot': 
+	   cp /storage/shared/software/Notebooks/$notebookDir/setPath.ipynb ./ &&
+           jupyter trust ./setPath.ipynb &&
+        #end if
+       
+        jupyter trust ./$notebookName &&
+
+	#if $mode.notebook_choice.notebook == 'Statistics':
+            #if $mode.notebook_choice.inputFile:
+    	        cp $mode.notebook_choice.inputFile $mode.notebook_choice.inputFile.element_identifier &&
+            #end if
+            cp /storage/shared/software/Scripts/Statistics/* ./ &&
+        #end if
+
+    #else if $mode.mode_select == 'upload':
+        #set $cleaned_name = re.sub('[^\w\-\.]', '_', str($notebook_upload.element_identifier))
+        cp '$mode.notebook_upload' ./${cleaned_name} &&
+        jupyter trust ./${cleaned_name} &&
+    #end if
+
+    jupyter lab --allow-root --no-browser  --ServerApp.token='' 
+
+    ]]>
+    </command>
+    <inputs>
+        <conditional name="mode">
+          <param name="mode_select" type="select" label="Start with the default FYS5555 notebooks or upload your own." help="">
+            <option value="default">Start with default notebooks</option>
+	    <option value="select">Select a single FYS5555 notebook</option>
+            <option value="upload">Load your notebook</option>
+          </param>
+
+	  <when value="select">
+	    <conditional name="notebook_choice">
+	      <param name="notebook" type="select" label="Select notebook">
+		<option value="DiLep">DiLep</option>
+		<option value="DiLepRFrame">DiLepRFrame</option>
+		<option value="ML">ML</option>
+		<option value="MakeTrain">MakeTrain</option>
+		<option value="NtupToHdf5">NtuptoHdf5</option>
+		<option value="Statistics">Statistics</option>
+	      </param>
+
+	      <when value="Statistics">
+		<param name="inputFile" type="data" format="inputs.txt" label="Upload inputs.txt file (optional) "  visible="false" optional="true"/>
+              </when>
+	    </conditional>
+	  </when>
+	  	  
+	  <when value="upload">
+	    <param name="notebook_upload" type="data" format="ipynb" label="Your notebook" 
+		   help="Upload your notebook by selecting a notebook from your history, or uploading a new one from your workstation." visible="false"/>
+	  </when>
+		  
+        </conditional>
+    </inputs>
+    <outputs>
+        <data name="jupyter_notebook" format="ipynb" label="Executed Notebook"></data>
+    </outputs>
+    <help>
+    The Jupyter Notebook is an open-source web application that allows you to create and share documents that contain live code, equations,
+    visualizations and narrative text. Uses include: data cleaning and transformation, numerical simulation, statistical modeling, data visualization,
+    machine learning, and much more.
+
+    Galaxy offers you to use Jupyter Notebooks directly in Galaxy accessing and interacting with Galaxy datasets as you like. A very common use-case is to
+    do the heavy lifting and data reduction steps in Galaxy and the plotting and more `interactive` part on smaller datasets in Jupyter.
+
+    You can start with a new Jupyter notebook from scratch or load an already existing one, e.g. from your collegue and execute it on your dataset.
+    If you have a defined input dataset you can even execute a Jupyter notebook in a workflow, given that the notebook is writing the output back to the history.
+
+    You can import data into the notebook via a predefined `get()` function and write results back to Galaxy with a `put()` function.
+    </help>
+  </tool>

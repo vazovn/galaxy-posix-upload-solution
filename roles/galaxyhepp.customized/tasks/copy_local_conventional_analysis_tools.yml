@@ -1,0 +1,17 @@
+---
+
+- name: Creates directory for local conventional analysis tools
+  file:
+    path: "{{ galaxy_local_tools_dir }}/conventional_analysis"
+    state: directory
+    owner: galaxy
+    group: galaxy
+    mode: 0775
+    recurse: yes
+
+- name: Copy local conventional analysis tool wrappers
+  copy:
+    src: "{{ galaxy_local_tools_src_dir }}/conventional_analysis/{{ item }}"
+    dest: "{{ galaxy_local_tools_dir }}/conventional_analysis/{{ item }}"
+  with_items: "{{ galaxy_local_conventional_analysis_tools | default([]) }}"
+  when: galaxy_local_conventional_analysis_tools is defined

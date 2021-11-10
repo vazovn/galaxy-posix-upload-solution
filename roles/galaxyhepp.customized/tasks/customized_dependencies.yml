@@ -1,0 +1,20 @@
+---
+# Manage customized Galaxy framework dependencies
+
+- name: Manage customized dependencies
+  block:
+
+    - name: Install proper python LDAP version
+      pip:
+        name: python_ldap==3.3.1
+        state: forcereinstall
+        virtualenv: "{{ galaxy_venv_dir }}"
+        virtualenv_command: "{{ galaxy_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
+      environment:
+        PYTHONPATH: null
+        VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
+      when: not ansible_check_mode
+
+  remote_user: "{{ galaxy_remote_users.privsep | default(__galaxy_remote_user) }}"
+  become: "{{ true if galaxy_become_users.privsep is defined else __galaxy_become }}"
+  become_user: "{{ galaxy_become_users.privsep | default(__galaxy_become_user) }}"

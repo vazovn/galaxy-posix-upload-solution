@@ -1,0 +1,14 @@
+---
+
+- include_tasks: rhel.yml
+    
+- name: Enable nginx (service)
+  service:
+    name: nginx
+    state: started
+    enabled: true
+
+- name: Restart Galaxy
+  service:
+    name: galaxy
+    state: restarted    

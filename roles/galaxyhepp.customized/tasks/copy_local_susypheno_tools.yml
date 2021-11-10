@@ -1,0 +1,17 @@
+---
+
+- name: Creates directory for local susypheno tools
+  file:
+    path: "{{ galaxy_local_tools_dir }}/susypheno"
+    state: directory
+    owner: galaxy
+    group: galaxy
+    mode: 0775
+    recurse: yes
+
+- name: Copy local susypheno tool wrappers
+  copy:
+    src: "{{ galaxy_local_tools_src_dir }}/susypheno/{{ item }}"
+    dest: "{{ galaxy_local_tools_dir }}/susypheno/{{ item }}"
+  with_items: "{{ galaxy_local_susypheno_tools | default([]) }}"
+  when: galaxy_local_susypheno_tools is defined

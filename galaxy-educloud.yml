@@ -1,0 +1,52 @@
+---
+- hosts: galaxy01_educloud
+  become: true
+  #vars:
+      #passwd_file_contents: "{{ lookup('file', '/uio/kant/usit-ft-u1/nikolaiv/galaxy-hepp-ldap-pass/galaxy_hepp_ldap_pass') }}"
+  handlers:
+    - name: Restart Galaxy
+      systemd:
+        name: galaxy
+        state: restarted
+
+  roles:
+    - galaxyproject.postgresql
+    - role: natefoo.postgresql_objects
+      become: true
+      become_user: postgres
+    - geerlingguy.pip
+    - role: galaxyproject.galaxy
+      become: true
+      become_user: "{{ galaxy_user.name }}"
+      # customized tasks
+###    - galaxyhepp.customized
+    - centos.zpath
+    - selinux.galaxy
+      # "selinux.galaxy.uwsgi" might be optional for uwsgi
+      # in case the context cannot be changed by 
+      # the previous role "selinux.galaxy"
+    - selinux.galaxy.uwsgi
+    - slurmdrmaa.galaxy
+    - usegalaxy_eu.galaxy_systemd
+    - centos.nginx
+###    - usegalaxy_eu.gie_proxy
+###    - selinux.galaxy.gie-proxy
+
+  tasks:
+    # Change ownership
+    #- name: Change galaxy data folder ownership
+      #become: true
+      #command: "chown -R galaxy:galaxy /storage/galaxy/"
+      #changed_when: false      
+      
+    #- name: Change galaxy server folder ownership
+      #become: true
+      #command: "chown -R galaxy:galaxy /srv/galaxy/"
+      #changed_when: false
+      
+    #- name: Change galaxy-gie-proxy  folder ownership
+      #become: true
+      #command: "chown -R galaxy:galaxy /srv/gie-proxy/"
+      #changed_when: false  
+    
+

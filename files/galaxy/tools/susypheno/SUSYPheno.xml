@@ -1,0 +1,64 @@
+<tool id="SUSYPheno" name="SUSYPheno" profile="16.04" version="1.0.0">
+<description></description>
+<requirements>
+        <requirement type="package" version="1.0.0">dataanalysis</requirement>
+</requirements>
+<command>
+	<![CDATA[
+
+    export SUSYPHENO_PATH="/storage/shared/software/Scripts/SUSYPheno";
+    export PATH="\${PATH}:\${SUSYPHENO_PATH}/bin";
+
+    #set $inputruncard=''
+    #set $newpath_data=''
+
+    #if len($runcards) > 0:
+      echo "runcard: $runcards[0].runcard";
+      #set $newpath_data='./'+$runcards[0].runcard.element_identifier
+      echo "newpath: " '$newpath_data';
+      cp $runcards[0].runcard $newpath_data;
+    #end if
+     
+    python '/storage/shared/software/Scripts/SUSYPheno/bin/signalgrid_loop.py'
+    #if $identifier['select'] == "select":
+        -fnadd "$identifier.value"
+    #end if
+
+    #if len($runcards) > 0:
+        -runcard "$newpath_data";
+    #else:
+         -mssmloop M1=100:M2=250:mu=400:TB=10:mA=2000;
+    #end if
+
+    tar -cf susypheno.tar *.*;
+      ]]>
+</command>
+
+<inputs>
+  <conditional name="identifier">
+    <param name="select" type="select" label="Optionally add an identifier">
+      <option value="none" selected="true">Use Default Identifier</option>
+      <option value="unique">Please Enter the Identifier</option>
+    </param>
+    <when value="unique">
+      <param name="value" type="text" label="Identitifer(eg. testgrid1)" help="Please enter the identifier you want to pass"/>
+    </when>
+  </conditional>
+
+    <repeat name="runcards" title="Runcard"  max="1">
+          <param name="runcard" type="data" format="txt" label="runcard"  title="runcard" help="Please select runCard" />
+    </repeat>
+</inputs>
+
+<outputs>
+  <data name="output1" format="tar" label="SUSYPheno tar file" hidden="true">
+    <discover_datasets pattern="(?P&lt;designation&gt;.*)\.tar" format="tar"  recurse="false" visible="true"/>
+  </data>
+  
+  <collection name="output2" type="list" label="SUSYPheno All txt files">
+    <discover_datasets pattern="(?P&lt;designation&gt;.*)\.txt"  format="txt"  recurse="true" visible="false"/>
+  </collection>
+</outputs>
+</tool>
+
+

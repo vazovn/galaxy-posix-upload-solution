@@ -1,0 +1,45 @@
+---
+
+
+# LDAP pass
+# Read the content of ~/galaxy-hepp-ldap-pass/galaxy_hepp_ldap_pass on the galaxy-hepp.hpc.uio.no
+# and insert it into the auth_conf.xml file
+
+- debug: msg="the value of UiO LDAP passwd is {{ passwd_file_contents }}"
+
+- name: Insert line with password
+  lineinfile:
+          path: "{{ galaxy_root }}/config/auth_conf.xml"
+          backup: yes
+          insertafter: '                 <search-user>cn=galaxy-hepp,cn=services,dc=uio,dc=no</search-user>'
+          line: "                 {{  passwd_file_contents  }}"
+
+
+## This task copies all our interactive tool wrappers added by us as local (customized)
+## The are located in {galaxy_root}}/local_tools
+## All wrappers must be defined in galaxy_hepp.yml under block
+## Local  Interactive Tools
+
+- name: Include local interactive tools
+  include_tasks: copy_local_interactive_tools.yml
+  when: galaxy_manage_static_setup
+
+- name: Include local conventional analysis tools
+  include_tasks:   copy_local_conventional_analysis_tools.yml  
+  when: galaxy_manage_static_setup
+  
+- name: Include local polarquest tools
+  include_tasks: copy_local_polarquest_tools.yml
+  when: galaxy_manage_static_setup
+
+- name: Include statistics tools
+  include_tasks: copy_local_statistics_tools.yml
+  when: galaxy_manage_static_setup
+  
+- name: Include customized dependencies
+  include_tasks: customized_dependencies.yml
+  when: galaxy_fetch_dependencies
+    
+#- name: Include test tools
+# include_tasks: copy_local_test_tools.yml
+#  when: galaxy_manage_static_setup

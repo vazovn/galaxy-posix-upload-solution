@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- toolbox tool_path="/srv/galaxy/var/shed_tools"-->
+<toolbox monitor="true">
+    <section id="getext" name="Get Local Data">
+      <tool file="data_source/upload.xml" />
+    </section>
+    <!-- <section id="getrem" name="Get Remote Data"> -->
+    <!--   <tool file="vdjdb_get_data/vdjdb_wrapper.xml"/> -->
+    <!--   <tool file="irp-galaxy-integration/irp-gateway.xml"/> -->
+    <!-- </section> -->
+    <!-- <section id="immuno_tools" name="immuneML Tools"> -->
+    <!--   <tool file="immuneml_tools/immuneml_create_dataset.xml"/> -->
+    <!--   <tool file="immuneml_tools/immuneml_simulate_dataset.xml"/> -->
+    <!--   <tool file="immuneml_tools/immuneml_simulate_events.xml"/> -->
+    <!--   <tool file="immuneml_tools/immuneml_train_recept.xml"/> -->
+    <!--   <tool file="immuneml_tools/immuneml_train_repert.xml"/> -->
+    <!--   <tool file="immuneml_tools/immuneml_train_ml_model.xml"/> -->
+    <!--   <tool file="immuneml_tools/immuneml_apply_ml_model.xml"/> -->
+    <!--   <tool file="immuneml_tools/immuneml_yaml.xml"/> -->
+    <!-- </section> -->
+</toolbox>

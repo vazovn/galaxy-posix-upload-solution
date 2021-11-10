@@ -1,0 +1,21 @@
+
+######## DEGUG WITH ##########
+## sealert -l "*" | less #####
+##############################
+  
+ # uswgi module (used for nfs mount of /storage/galaxy)
+ ## The following setup is created by 
+ # >ausearch -c 'uwsgi' --raw | audit2allow -M my-uwsgi
+ # >semodule -i my-uwsgi.pp
+
+- name:  "Copy selinux files for uwsgi"
+  copy:  src="{{ role_path }}/files/my-uwsgi.te" dest=/tmp/selinux
+  
+- name: "Check modules uwsgi "
+  shell: "checkmodule -M -m -o /tmp/selinux/my-uwsgi.mod /tmp/selinux/my-uwsgi.te"
+
+- name: "Package modules uwsgi"
+  shell: "semodule_package -o /tmp/selinux/my-uwsgi.pp -m /tmp/selinux/my-uwsgi.mod"
+  
+- name: "Install modules uwsgi"
+  shell: "semodule -i /tmp/selinux/my-uwsgi.pp"

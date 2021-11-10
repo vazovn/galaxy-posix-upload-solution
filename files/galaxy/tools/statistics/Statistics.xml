@@ -1,0 +1,57 @@
+<tool id="statistics" name="Statistics" profile="16.04" version="1.0.0">
+    <description></description>
+    <requirements>
+        <requirement type="package" version="1.0.0">root_foss_python</requirement>
+    </requirements>
+    <command>
+        <![CDATA[
+       
+
+        #if $Statistic['InputOption'] == "Default":
+        rsync -av /storage/shared/software/Scripts/Statistics/ ./;
+        #elif $Statistic['InputOption'] == "Upload":
+        #set $origname_data = $inputFile.element_identifier
+        rsync -av /storage/shared/software/Scripts/Statistics/ ./ --exclude=inputs.txt;
+        #set $newpath_data='./'+$origname_data
+        cp $inputFile $newpath_data;
+        echo "Input File :"'$inputFile.element_identifier';
+        #end if
+     	python makeLimitPlots.py;
+
+          ]]>
+    </command>
+    <inputs>
+        <conditional name="Statistic">
+            <param name="InputOption" type="select" label="choose which  file to use">
+                <option value="Default" selected="true">Default</option>
+                <option value="Upload">Upload</option>
+            </param>
+            <when value="Upload">
+                <param name="inputFile" type="data" format="inputs.txt" label="Upload inputs.txt file " title="InputFile" visible="false" />
+            </when>
+        </conditional>
+    </inputs>
+    <outputs>
+        <collection name="limitplot" type="list" label="Statistics Plots and limits $Statistic.InputOption">
+            <discover_datasets pattern="(?P&lt;designation&gt;.*)\.png" ext="png" recurse="true" visible="false" />
+            <discover_datasets pattern="(?P&lt;designation&gt;.*limit.*)\.txt" ext="txt" recurse="true" visible="false" />
+        </collection>
+    </outputs>
+    <help>
+        * **Statistics**:
+        
+        The computation of "cut-and-count" ("single-bin") cross section limits on a new signal process and production of standard limit plots including bands for the 1- and 2-sigma variations of the limit around the expected (median) value.Inputs are read from the file "inputs.txt", which is currently set up to reproduce the electron channel limits.
+        
+        **Combining channels**
+        
+        A corresponding script is also provided for running limit calculations that combine the information in two or more channels.
+        Note that the limit calculations in this case can take considerably longer, and the accuracy parameters in the script "runLimits_combined.cpp" are tuned to give a relatively nice plot in about 2.5 hours for the example inputs.
+        
+        Steps to follow in order to execute the tool:
+        
+        1. Select the default input file or upload own inputs.txt file, While uploading select the type as inputs.txt.
+        2. Click on Execute.
+        
+        </help>
+</tool>
+        

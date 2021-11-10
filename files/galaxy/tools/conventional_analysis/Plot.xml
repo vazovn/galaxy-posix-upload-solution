@@ -1,0 +1,66 @@
+<tool id="plotHistograms" name="Plot" profile="16.04" version="1.0.0">
+<description></description>
+<requirements>
+        <requirement type="package" version="1.0.0">root_foss_python</requirement>
+</requirements>
+  <command>
+    <![CDATA[
+             #set $orignames_data = []
+             #set $galaxynames_data = []
+             #set $orignames_mc = []
+             #set $galaxynames_mc = []
+             #for $d in $mcFileList
+             #set $tmpname=$d.element_identifier
+             #silent orignames_mc.append("%s.root" % $tmpname)
+             #silent galaxynames_mc.append("%s" % $d)
+             #end for
+             #for $d in $dataFileList
+             #set $tmpname=$d.element_identifier
+             #silent orignames_data.append("%s.root" % $tmpname)
+             #silent galaxynames_data.append("%s" % $d)
+             #end for
+
+	     #if $file['filetype'] == "default":
+             python '/storage/shared/software/Scripts/ATLASOpenData/13TeV/copyForMakePlots.py' '$galaxynames_data' '$orignames_data' '$galaxynames_mc' '$orignames_mc';
+             python '/storage/shared/software/Scripts/ATLASOpenData/13TeV/MakePlots.py' '$file.channel';
+	     echo 'channel' '$file.channel';
+
+	     #elif $file['filetype'] == "upload":
+	     python '/storage/shared/software/Scripts/ATLASOpenData/13TeV/copy.py' '$galaxynames_data' '$orignames_data' '$galaxynames_mc' '$orignames_mc';
+	     python '$MakePlot' ;
+	     #end if
+
+	     ]]>
+  </command>
+  <inputs>
+	    <conditional name="file">
+            <param name="filetype" type="select" label="choose which header and source file to use">
+                <option value="default" selected="true">Use Default files</option>
+                <option value="upload">Upload the files</option>
+	</param>
+	<when value="default">
+		 <param name="channel" type="select" label="Channel">
+    			  <option value="ee" selected="true">ee</option>
+			  <option value="uu">uu</option>
+			  <option value="ee and uu">ee and uu</option>
+
+                  </param>
+		</when>
+            <when value="upload">
+		<param name="MakePlot" type="data" format="source.py" label="Uploat MakePlot" title="InputFiles" help="Please select MakePlot" visible="false"/>	
+	</when>
+</conditional>
+   
+    <param name="dataFileList" type="data_collection"  collection_type="list" format="hep.data.root"  label="ATLASOpenData - Data root file" />
+    <param name="mcFileList" type="data_collection"  collection_type="list" format="hep.mc.root"  label="ATLASOpenData - MC root file(s)" />
+  </inputs>
+
+  <outputs>
+    <collection name="output" type="list" label="ATLASOpenData - Plots">
+      <discover_datasets pattern="(?P&lt;designation&gt;.+)\.png"  directory="Histograms/Plots"  ext="png"  recurse="true" visible="false" from_tool_provided_metadata="true" />
+    </collection>
+    
+	<!--		 <data directory="./Histograms/Plots/"  format="png" recurse="true" name="output" />-->
+
+  </outputs>
+</tool>
