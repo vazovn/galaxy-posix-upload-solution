@@ -1,0 +1,8 @@
+---
+
+- name: Copy lifeportal fox backend
+  copy:
+    src: "files/galaxy/oidc_files/{{ item }}"
+    dest: "{{ galaxy_oidc_backend_files_target_dir}}/{{ item }}"
+  with_items: "{{ galaxy_oidc_backend_files | default([]) }}"
+  when:  galaxy_oidc_backend_files is defined

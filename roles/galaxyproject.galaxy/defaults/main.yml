@@ -36,7 +36,7 @@ galaxy_backup_configfiles: yes
 # using privilege separation, it is possible to run this role as an unprivileged user with no escalation. In such a
 # case, set `galaxy_become_users` to an empty hash like so:
 #
-#galaxy_become_users: {}
+# galaxy_become_users: {}
 
 # Attempt to automatically decide whether to use `become` and which users to `become`. To disable, set
 # `galaxy_become_users` to an empty hash.
@@ -68,7 +68,8 @@ galaxy_separate_privileges: no
 galaxy_user: "{{ ansible_user_id }}"
 
 # User that owns Galaxy code, configs, and virutalenv, and that runs `pip install` for dependencies
-galaxy_privsep_user: root
+# galaxy_privsep_user: root
+galaxy_privsep_user: ec-galaxy
 
 # No explicit group is created by default, system policy will decide users' groups. However, in order to enable
 # privilege separation without making configs world-readable, the users should share a common group. This group will be

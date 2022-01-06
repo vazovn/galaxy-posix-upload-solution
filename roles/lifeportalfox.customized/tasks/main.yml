@@ -1,0 +1,26 @@
+---
+
+- name: Include lifeportal_fox social_backend
+  include_tasks: copy_lifeportal_fox_backend.yml
+  when: galaxy_manage_static_setup
+  
+- name: Insert fox image in managers py
+  lineinfile:
+          path: "{{ galaxy_server_dir }}/lib/galaxy/authnz/managers.py"
+          backup: yes
+          insertafter : "^DEFAULT_OIDC_IDP_ICONS"
+          line: "    'lifeportalfox': 'https://www.usit.uio.no/bilder/fox_man2.png?vrtx=thumbnail',"
+
+- name: Insert lifeportalfox backend in psa authnz py
+  lineinfile:
+          path: "{{ galaxy_server_dir }}/lib/galaxy/authnz/psa_authnz.py"
+          backup: yes
+          insertafter: "^BACKENDS "
+          line: "    'lifeportalfox': 'social_core.backends.lifeportal_fox.LifeportalFoxOpenIdConnect',"
+
+- name: Insert  lifeportalfox backend name in psa authnz py
+  lineinfile:
+          path: "{{ galaxy_server_dir }}/lib/galaxy/authnz/psa_authnz.py"
+          backup: yes
+          insertafter: "^BACKENDS_NAME"
+          line: "    'lifeportalfox': 'lifeportalfox',"

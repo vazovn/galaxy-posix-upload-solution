@@ -7,28 +7,20 @@
 ##############################
 
 # equivalent of
-# 1) semanage fcontext -a -t var_t "/srv/galaxy(/.*)?"
-# 2) restorecon -Rv /srv/galaxy
+# 1) semanage fcontext -a -t var_t "/galaxy/srv/galaxy(/.*)?"
+# 2) restorecon -Rv /galaxy/srv/galaxy
 
-- name: Set selinux-fcontext for /srv/galaxy
+- name: Set selinux-fcontext for /galaxy/srv/galaxy
   sefcontext:
-    target: '/srv/galaxy(/.*)?'
+    target: '/galaxy/srv/galaxy(/.*)?'
     setype: var_t
-    state: present
-
-- name: Set selinux-fcontext for /storage/galaxy
-  sefcontext:
-    target: '/storage(/galaxy/.*)?'
-    setype: var_t
-    seuser: system_u
     state: present
 
 # Run in case the above commands fail
 - name: Run restorecon -Rv just in case if sefcontext fails
   command: "{{ item }}"
   with_items:
-    - "restorecon -Rv /storage/galaxy/"
-    - "restorecon -Rv /srv/galaxy/"
+    - "restorecon -Rv /galaxy/srv/galaxy/"
 
 # in ansible that will be something like this, then you will kind off have a sort of documentation on what is done as well, so I recomend putting it ansible (you can do it in the terminal as well).
 - name: Set network persmissions for galaxy to use tcp-ports

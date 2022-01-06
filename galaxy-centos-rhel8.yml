@@ -1,5 +1,5 @@
 ---
-- hosts: galaxy_hepp
+- hosts: galaxy01_educloud
   become: true
   pre_tasks:
     - name: Update and upgrade all yum packages
@@ -22,7 +22,7 @@
         - '@Container Management'
         - '@Headless Management'
         - '@System Tools'
-	- epel-release
+        - epel-release
 
     - name: Galaxy Dependencies
       yum:

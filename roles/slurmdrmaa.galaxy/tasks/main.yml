@@ -8,14 +8,13 @@
        - ragel.x86_64
     state: present
 
-
 - name: Copy slurm-drmaa source
   copy:
     src: "{{ role_path }}/files/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz"
     dest: /tmp/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz
     mode: ugo+rw
-    owner: root
-    group: root
+    owner: "{{ galaxy_user.name }}"
+    group: "{{ galaxy_group.name }}"
     
 - name: Copy slurm-drmaa conf
   copy:
@@ -29,21 +28,24 @@
   unarchive:
       src: "/tmp/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz"
       dest: "/tmp"
-      owner: root
+      owner: "{{ galaxy_user.name }}"
       remote_src: yes
       mode: 01777
     
 - name: Running ./configure for slurm-drmaa
-  shell:  ./configure --with-slurm-inc=/usr/include --with-slurm-lib=/usr/lib64/ --prefix=/srv/drmaa/ --enable-debug
+  shell:  ./configure --with-slurm-inc=/usr/include --with-slurm-lib=/usr/lib64/ --prefix=/drmaa/ --enable-debug
   args:
     chdir: "/tmp/slurm-drmaa-{{ slurm_drmaa_version }}"
   environment:
     LD_LIBRARY_PATH: '$LD_LIBRARY_PATH:/usr/lib64'
     CXXFLAGS: "-g -00"
+  become: yes
+  become_user: "{{ galaxy_user.name }}"
     
-
 - name: Running "make" for slurm-drmaa
   command: 'make chdir=/tmp/slurm-drmaa-{{ slurm_drmaa_version }}'
+  become: yes
+  become_user: "{{ galaxy_user.name }}"
 
 - name: Running "make install" for slurm-drmaa
   command: 'make install chdir=/tmp/slurm-drmaa-{{ slurm_drmaa_version }}'

@@ -8,7 +8,12 @@
     state: started
     enabled: true
 
-- name: Restart Galaxy
-  service:
-    name: galaxy
-    state: restarted    
+#- name: Restart Galaxy
+  #service:
+    #name: galaxy
+    #state: restarted    
+
+
+
+
+

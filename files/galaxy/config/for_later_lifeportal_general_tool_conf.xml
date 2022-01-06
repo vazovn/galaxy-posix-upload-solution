@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<toolbox monitor="true">
+  <!--
+  <label text="Defualt tools" id="dft" />
+  <section id="getext" name="Get Data">
+    <tool file="data_source/upload.xml" />
+    <tool file="data_source/ucsc_tablebrowser.xml" />
+  </section>
+  <section id="convert" name="Convert Formats">
+    <tool file="filters/bed2gff.xml" />
+    <tool file="filters/gff2bed.xml" />
+    <tool file="maf/maf_to_bed.xml" />
+    <tool file="maf/maf_to_interval.xml" />
+    <tool file="maf/maf_to_fasta.xml" />
+    <tool file="filters/sff_extractor.xml" />
+    <tool file="filters/wig_to_bigwig.xml" />
+    <tool file="filters/bed_to_bigbed.xml" />
+  </section>
+  <section id="filter" name="Filter and Sort">
+    <tool file="stats/filtering.xml" />
+    <tool file="filters/sorter.xml" />
+    <tool file="filters/grep.xml" />
+    <label id="gff" text="GFF" />
+    <tool file="filters/gff/extract_GFF_Features.xml" />
+    <tool file="filters/gff/gff_filter_by_attribute.xml" />
+    <tool file="filters/gff/gff_filter_by_feature_count.xml" />
+    <tool file="filters/gff/gtf_filter_by_attribute_values_list.xml" />
+  </section>
+  <section id="stats" name="Statistics">
+    <tool file="stats/gsummary.xml" />
+    <tool file="filters/uniq.xml" />
+  </section>
+  <section id="plots" name="Graph/Display Data">
+    <tool file="maf/vcf_to_maf_customtrack.xml" />
+  </section>
+  -->
+</toolbox>
