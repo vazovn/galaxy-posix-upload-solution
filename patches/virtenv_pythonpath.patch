@@ -1,0 +1,27 @@
+diff --git a/roles/galaxyproject.galaxy/tasks/virtualenv.yml b/roles/galaxyproject.galaxy/tasks/virtualenv.yml
+index 58d3542..72ad170 100644
+--- a/roles/galaxyproject.galaxy/tasks/virtualenv.yml
++++ b/roles/galaxyproject.galaxy/tasks/virtualenv.yml
+@@ -14,13 +14,19 @@
+   environment:
+     VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
+ 
+-- name: Ensure pip is the latest release
++- name: Ensure pip and setuptools are the latest release
+   pip:
+-    name: pip
++    name: 
++      - pip
++      - setuptools
+     state: latest
+     extra_args: "{{ pip_extra_args | default('') }}"
+     virtualenv: "{{ galaxy_venv_dir }}"
+     virtualenv_command: "{{ galaxy_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
+   environment:
+-    PYTHONPATH: null
++    #PYTHONPATH:  null
++    # In order to use system-wide installed socks we need to set the PYTHONPATH  to both venv one and the system wide one
++    # The venv one is /galaxy/srv/galaxy/venv/lib/python3.6/site-packages/
++    # The system one is : /usr/lib/python3.6/site-packages/
++    PYTHONPATH:  "{{ galaxy_venv_dir }}/lib/python3.6/site-packages/:/usr/lib/python3.6/site-packages/"
+     VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
