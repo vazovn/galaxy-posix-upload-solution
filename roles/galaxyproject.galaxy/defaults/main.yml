@@ -19,6 +19,13 @@ galaxy_fetch_dependencies: yes
 galaxy_build_client: yes
 galaxy_manage_errordocs: no
 galaxy_backup_configfiles: yes
+galaxy_manage_systemd: yes # For Galaxy
+galaxy_manage_systemd_reports: yes # For Reports
+
+
+# Control whether to output verbose task diffs (e.g. when performing a git update) when running Ansible with --diff.
+# Only suppresses diff on tasks that are likely to be verbose, not all tasks
+galaxy_diff_mode_verbose: "{{ ansible_diff_mode }}"
 
 #
 # Access method control
@@ -180,18 +187,7 @@ galaxy_app_config_default:
   tool_sheds_config_file: "{{ galaxy_server_dir }}/config/tool_sheds_conf.xml.sample"
 
   # Various cache and temporary directories
-  template_cache_path: "{{ galaxy_cache_dir }}/template_cache"
-  whoosh_index_dir: "{{ galaxy_cache_dir }}/whoosh_cache"
-  object_store_cache_path: "{{ galaxy_cache_dir }}/object_store_cache"
-  openid_consumer_cache_path: "{{ galaxy_cache_dir }}/openid_consumer_cache"
-  citation_cache_data_dir: "{{ galaxy_cache_dir }}/citations/data"
-  citation_cache_lock_dir: "{{ galaxy_cache_dir }}/citations/locks"
-  new_file_path: "{{ galaxy_mutable_data_dir }}/tmp"
-  mulled_resolution_cache_data_dir: "{{ galaxy_mutable_data_dir }}/mulled/data"
-  mulled_resolution_cache_lock_dir: "{{ galaxy_mutable_data_dir }}/mulled/lock"
-  tool_cache_data_dir: "{{ galaxy_cache_dir }}/tool_cache"
-  tool_search_index_dir: "{{ galaxy_cache_dir }}/tool_search_index"
-  container_image_cache_path: "{{ galaxy_cache_dir }}/container_cache"
+  data_dir: "{{ galaxy_mutable_data_dir }}"
 
   # Mutable config files
   integrated_tool_panel_config: "{{ galaxy_mutable_config_dir }}/integrated_tool_panel.xml"
@@ -208,6 +204,10 @@ galaxy_app_config_default:
   tool_config_file: "{{ galaxy_tool_config_files | join(',') }}"
   shed_tool_config_file: "{{ galaxy_shed_tool_config_file }}"
 
+  # Static configs that default to .xml files in the config dir but the role writes as .yml if configured
+  job_metrics_config_file: "{{ galaxy_config_dir }}/job_metrics_conf.{{ (galaxy_job_metrics_plugins is defined) | ternary('yml', 'xml') }}"
+  dependency_resolvers_config_file: "{{ galaxy_config_dir }}/dependency_resolvers_conf.{{ (galaxy_dependency_resolvers is defined) | ternary('yml', 'xml') }}"
+  containers_resolvers_config_file: "{{ (galaxy_container_resolvers is defined) | ternary(galaxy_config_dir ~ '/container_resolvers_conf.yml', none) }}"
   # Everything else
   visualization_plugins_directory: "config/plugins/visualizations"
 
@@ -270,6 +270,8 @@ galaxy_uwsgi_config_default:
 # Options include: client / client-production / client-production-maps (default). Set to null to invoke each step of the
 # build separately, but this is not guaranteed to work for all version of Galaxy - using `make` is the safer choice.
 galaxy_client_make_target: client-production-maps
+# If galaxy_client_make_target is null, you can set this to `development` to build the client for development
+galaxy_client_node_env: production
 galaxy_client_build_steps:
   default:
     - client
@@ -279,3 +281,27 @@ galaxy_client_build_steps:
     - stageLibs
     - plugins
 
+# Restart handler is already set if using the systemd options in this role, otherwise you need to define one yourself
+galaxy_restart_handler_name: "{{ 'galaxy mule restart' if (galaxy_systemd_mode == 'mule' and galaxy_manage_systemd) else 'default restart galaxy handler' }}"
+
+#
+# systemd options
+#
+
+# Currently `mule` is the only systemd mode
+galaxy_systemd_mode: mule
+
+# Systemd will create cgroups to enforce these limits (sizes in GB), override individual limits by setting
+# `galaxy_systemd_memory_limit.<limit>` in your vars.
+__galaxy_systemd_memory_limit:
+  # This is for the entire group of uWSGI master, web worker, and mule processes
+  mule: 16
+  reports: 5
+  #workflow: 5
+  #zergpool: 8
+  #zergling: 16
+  #handler: 5
+__galaxy_systemd_memory_limit_merged: "{{ __galaxy_systemd_memory_limit | combine(galaxy_systemd_memory_limit | default({})) }}"
+
+# A list of KEY=val strings to be added as `Environment=KEY=val` to the systemd service unit
+galaxy_systemd_env: []

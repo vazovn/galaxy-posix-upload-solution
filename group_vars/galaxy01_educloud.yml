@@ -246,9 +246,9 @@ galaxy_dynamic_job_rules:
   - destinations.py
 
 # systemd
-galaxy_systemd_mode: mule
+#galaxy_systemd_mode: mule
 __galaxy_systemd_memory_limit_merged: 
     mule: 32
 galaxy_systemd_env: [DRMAA_LIBRARY_PATH="/drmaa/lib/libdrmaa.so.1"]
-galaxy_restart_handler_name: "Restart Galaxy"
+#galaxy_restart_handler_name: "Restart Galaxy"
 
