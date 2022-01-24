@@ -14,18 +14,11 @@
         - daemon reload
         - galaxy mule restart
 
-    #- name: Enable Galaxy Unit
-      #systemd:
-        #name: galaxy.service
-        #enabled: yes
-
-    - name: Enable a user service when XDG_RUNTIME_DIR is not set on remote login
+    - name: Enable a user service
       systemd:
           name: galaxy.service
           enabled: yes
           scope: user
-      environment:
-          XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user.uid }}"
 
   #remote_user: "{{ galaxy_remote_users.root | default(__galaxy_remote_user) }}"
   #become: "{{ true if galaxy_become_users.root is defined else __galaxy_become }}"

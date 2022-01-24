@@ -3,6 +3,11 @@
 
 # Some custom requirements
 
+## Setup of `systemd` as a **galaxy** user
+
+- all changes are in the branch *user-systemd*
+- all patches are in the directory `user-systemd-patches`
+
 ## log4s issue and socks solution
 
 To run the ansible paybook from your local machine on *galaxy01.educloud.no* :
@@ -26,6 +31,17 @@ To run the ansible paybook from your local machine on *galaxy01.educloud.no* :
     to
 
 		/roles/galaxyproject.galaxy/tasks/virtualenv.yml
-		
+
+
 ## OpenIdc 
 
+Place the backend (*.py file*) here:
+
+		/galaxy/srv/galaxy/venv/lib/python3.6/site-packages/social_core/backends
+
+The necessary changes to the authnz files (the files managing the authentication procedure) :
+
+		/galaxy/srv/galaxy/server/lib/galaxy/authnz : psa_authnz.py
+		/galaxy/srv/galaxy/server/lib/galaxy/authnz: managers.py
+		
+are made in the role *lifeportal.customized* in *tasks/main.yml*. These changes add the icons of the endpoints and add backends and backends names

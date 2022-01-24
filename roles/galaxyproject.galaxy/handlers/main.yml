@@ -18,21 +18,15 @@
   systemd:
     daemon_reload: yes
     scope: user
-  environment:
-          XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user.uid }}"
 
 - name: galaxy mule start
   systemd:
       name: galaxy.service
       state: started
       scope: user
-  environment:
-          XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user.uid }}"
 
 - name: galaxy mule restart
   systemd:
       name: galaxy.service
       state: restarted
       scope: user
-  environment:
-          XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user.uid }}"

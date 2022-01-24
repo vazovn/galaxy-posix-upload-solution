@@ -7,11 +7,11 @@
       #passwd_file_contents: "{{ lookup('file', '/uio/kant/usit-ft-u1/nikolaiv/galaxy-hepp-ldap-pass/galaxy_hepp_ldap_pass') }}"
 
   roles:
-    #- galaxyproject.postgresql
-    #- role: natefoo.postgresql_objects
-      #become: true
-      #become_user: postgres
-    #- geerlingguy.pip
+    - galaxyproject.postgresql
+    - role: natefoo.postgresql_objects
+      become: true
+      become_user: postgres
+    - geerlingguy.pip
     - role: galaxyproject.galaxy
       become: true
       become_user: "{{ galaxy_user.name }}"
@@ -19,21 +19,15 @@
     - role: lifeportalfox.customized
       become: true
       become_user: "{{ galaxy_user.name }}"
-##    - centos.zpath (Copies welcome page)
-#    - selinux.galaxy
-      # "selinux.galaxy.uwsgi" might be optional for uwsgi
-      # in case the context cannot be changed by 
-      # the previous role "selinux.galaxy"
-#    - selinux.galaxy.uwsgi
-    #- role: slurmdrmaa.galaxy
-      #become: yes
-      #become_user: root
-    #- role: usegalaxy_eu.galaxy_systemd
-      #become: true
-      #become_user: "{{ galaxy_user.name }}"
-    #- centos.nginx
+    - role: slurmdrmaa.galaxy
+      become: yes
+      become_user: root
+    - centos.nginx
 
   environment:
     http_proxy: socks5://127.0.0.1:12354
     https_proxy: socks5://127.0.0.1:12354
-    XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user.uid }}"
+    
+    # Enable the following variable in the terminal of the remote host (galaxy01.edicloud.no) in order to run
+    # systemctl --user status galaxy and othe systemctl commands as ec-galaxy user
+    #XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user.uid }}"
