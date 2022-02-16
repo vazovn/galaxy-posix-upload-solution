@@ -60,7 +60,7 @@ are made in the role *lifeportal.customized* in *tasks/main.yml*. These changes 
 - add _slurm_ user to `/etc/passwd` - copy the line from any fox login node
 - copy the controll machine ip to `/etc/hosts` - los
 
-	10.110.0.2	los los.fox
-	10.111.0.2	los-mgmt los-mgmt.fox
-	10.112.0.2	los-ib los-ib.fox
+		10.110.0.2	los los.fox
+		10.111.0.2	los-mgmt los-mgmt.fox
+		10.112.0.2	los-ib los-ib.fox
 
