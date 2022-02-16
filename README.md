@@ -24,13 +24,16 @@ To run the ansible paybook from your local machine on *galaxy01.educloud.no* :
 			http_proxy: socks5://127.0.0.1:12354
 			https_proxy: socks5://127.0.0.1:12354
     
- - patch the file
+ - patch the file 
 
 		/patches/virtenv_pythonpath.patch
 
     to
 
 		/roles/galaxyproject.galaxy/tasks/virtualenv.yml
+
+    The goal of this patch is to use system-wide installed socks package. Socks is needed to fetch the galaxy code 
+    from other sources but is not available in the galaxy's venv. To avoid the catch 22 we append the system-wide pythonpath 
 
 
 ## OpenIdc 
