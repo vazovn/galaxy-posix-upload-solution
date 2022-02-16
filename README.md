@@ -48,3 +48,19 @@ The necessary changes to the authnz files (the files managing the authentication
 		/galaxy/srv/galaxy/server/lib/galaxy/authnz: managers.py
 		
 are made in the role *lifeportal.customized* in *tasks/main.yml*. These changes add the icons of the endpoints and add backends and backends names
+
+
+## Slurm (for submit host)
+
+- copy all the _fox-slurm_ rpms from `/cluster/staff/slurm/20.11.8/`
+- install them : `yum localinstall fox-slurm-*`
+- copy all the `*.conf` files from  `/etc/slurm` in any fox login host
+- install munge with yum
+- copy the `munge.key` file from any fox login node to `/etc/munge/` 
+- add _slurm_ user to `/etc/passwd` - copy the line from any fox login node
+- copy the controll machine ip to `/etc/hosts` - los
+
+	10.110.0.2	los los.fox
+	10.111.0.2	los-mgmt los-mgmt.fox
+	10.112.0.2	los-ib los-ib.fox
+
