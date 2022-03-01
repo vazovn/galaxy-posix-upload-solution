@@ -54,9 +54,8 @@ are made in the role *lifeportal.customized* in *tasks/main.yml*. These changes 
 
 - copy all the _fox-slurm_ rpms from `/cluster/staff/slurm/20.11.8/`
 - install them : `yum localinstall fox-slurm-*`
-- copy
-		all the `*.conf` files from  `/etc/slurm` in any fox login host
-		edit the value of  ControlMachine` in the file `/etc/slurm/slurm.conf` like this : `ControlMachine=los.fox.ad.fp.educloud.no`
+- copy all the `*.conf` files from  `/etc/slurm` in any fox login host
+- edit the value of `ControlMachine` in the file `/etc/slurm/slurm.conf` like this : `ControlMachine=los.fox.ad.fp.educloud.no`
 - install munge with yum
 - copy the `munge.key` file from any fox login node to `/etc/munge/` 
 - add _slurm_ user to `/etc/passwd` - copy the line from any fox login node
