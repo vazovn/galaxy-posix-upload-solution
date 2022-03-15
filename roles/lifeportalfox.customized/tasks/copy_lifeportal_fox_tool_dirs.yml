@@ -1,0 +1,7 @@
+---
+
+- name: Copy lifeportal fox tool directories
+  copy:
+    src: "files/galaxy/tools/prod/"
+    dest: "{{ tools_root }}" # /cluster/galaxy/data/tools/prod
+  when:  tools_root is defined

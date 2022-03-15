@@ -49,6 +49,16 @@
           include_tasks: _inc_node_version.yml
           when: galaxy_node_version is undefined
 
+
+
+        - name: Printing the environment​ variable in Ansible
+          debug:
+             msg: "ANSIBLE PATH IS : {{ ansible_env.PATH }}"
+
+
+
+
+
         - name: Install node
           command: "nodeenv -n {{ galaxy_node_version }} -p"
           environment:

@@ -1,0 +1,11 @@
+<tool id="g_load" name="freepe(Check load)">
+    <requirements>
+        <requirement type="package" version="1.0.0">get_job_status</requirement>
+    </requirements>
+    <command>
+        <![CDATA[ g_load.sh > "$output1" ]]>
+    </command>
+    <outputs>
+        <data name="output1" format="txt" />
+    </outputs>
+</tool>

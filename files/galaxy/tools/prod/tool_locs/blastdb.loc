@@ -1,0 +1,24 @@
+16S_ribosomal_RNA_04-02-2021	Microbial 16S RNA	/cluster/shared/databases/blast/2021-05-27/16S_ribosomal_RNA
+18S_fungal_sequences_04-02-2021	Fungal 18S	/cluster/shared/databases/blast/2021-05-27/18S_fungal_sequences
+28S_fungal_sequences_04-02-2021	Fungal 28S	/cluster/shared/databases/blast/2021-05-27/28S_fungal_sequences
+Betacoronavirus_04-02-2021	Coronavirus	/cluster/shared/databases/blast/2021-05-27/Betacoronavirus
+env_nt_04-02-2021	env_nt	/cluster/shared/databases/blast/2021-05-27/env_nt
+GCF_000001405_04-02-2021	Human GRCh38.p12	/cluster/shared/databases/blast/2021-05-27/GCF_000001405.38_top_level
+GCF_000001635_04-02-2021	Mouse GRCm38.p6	/cluster/shared/databases/blast/2021-05-27/GCF_000001635.26_top_level
+ITS_eukaryote_sequences_04-02-2021	Eukaryotic Internal Transcribed Spacer sequences	/cluster/shared/databases/blast/2021-05-27/ITS_eukaryote_sequences
+ITS_RefSeq_Fungi_04-02-2021	Fungal Internal Transcribed Spacer sequences	/cluster/shared/databases/blast/2021-05-27/ITS_RefSeq_Fungi
+LSU_eukaryote_rRNA_04-02-2021	Eukaryotic large submit rRNA	/cluster/shared/databases/blast/2021-05-27/LSU_eukaryote_rRNA
+LSU_prokaryote_rRNA_04-02-2021	Prokaryotic large submit rRNA	/cluster/shared/databases/blast/2021-05-27/LSU_prokaryote_rRNA
+mito_04-02-2021	Mitocondrial	/cluster/shared/databases/blast/2021-05-27/mito
+nt_04-02-2021	Sequences from bulk divisions(e.g gss,est)	/cluster/shared/databases/blast/2021-05-27/nt
+patnt_04-02-2021	Nucleotide sequences from patents 	/cluster/shared/databases/blast/2021-05-27/patnt
+pdbnt_04-02-2021	Nucleotide components for PDB	/cluster/shared/databases/blast/2021-05-27/pdbnt
+ref_euk_rep_genomes_04-02-2021	RefSeq Eukaryotic representative genomes	/cluster/shared/databases/blast/2021-05-27/ref_euk_rep_genomes
+ref_prok_rep_genomes_04-02-2021	RefSeq Prokaryotic representative genomes	/cluster/shared/databases/blast/2021-05-27/ref_prok_rep_genomes
+refseq_rna_04-02-2021	NCBI RefSeq RNA	/cluster/shared/databases/blast/2021-05-27/refseq_rna
+refseq_select_prot_04-02-2021	refseq_select_prot_04-02-2021	/cluster/shared/databases/blast/2021-05-27/refseq_select_prot
+refseq_select_rna_04-02-2021	refseq_select_rna_04-02-2021	/cluster/shared/databases/blast/2021-05-27/refseq_select_rna
+ref_viroids_rep_genomes_04-02-2021	RefSeq viriod representative genomes	/cluster/shared/databases/blast/2021-05-27/ref_viroids_rep_genomes
+ref_viruses_rep_genomes_04-02-2021	RefSeq virus representative genomes	/cluster/shared/databases/blast/2021-05-27/ref_viruses_rep_genomes
+SSU_eukaryote_rRNA_04-02-2021	SSU_eukaryote	/cluster/shared/databases/blast/2021-05-27/SSU_eukaryote_rRNA
+tsa_nt_04-02-2021	Transcriptome Shotgun Assembly (TSA)	/cluster/shared/databases/blast/2021-05-27/tsa_nt

@@ -1,0 +1,4 @@
+<tool id="g_get_from_home" name="Get data from SAGA home" version="1.0.0"> 
+<!-- https://docs.galaxyproject.org/en/latest/dev/schema.html -->	
+    <description>To get files from Saga Home directory</description>
+</tool>

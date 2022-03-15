@@ -20,13 +20,14 @@ def integrate_job_destination_params(app, tool, job):
          # Get all required params from the tool menu : job resource parameters
          time = str(param_dict['__job_resource']['time'])
          memory = str(param_dict['__job_resource']['memory'])
+         project = str(param_dict['__job_resource']['project'])
     
          destination = app.job_config.get_destination(destination_id)
     
          # set walltime
          if 'nativeSpecification' not in destination.params:
               destination.params['nativeSpecification'] = ''
-         destination.params['nativeSpecification'] = "--time=%s:00:00 --mem-per-cpu=%s " % (time,memory)
+         destination.params['nativeSpecification'] = "--account=%s --time=%s:00:00 --mem-per-cpu=%s " % (project,time,memory)
     
      except:
          

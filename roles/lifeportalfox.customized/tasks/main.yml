@@ -1,5 +1,13 @@
 ---
 
+- name: Set welcome page
+  include_tasks: copy_welcome_page.yml
+  when: galaxy_manage_static_setup
+
+- name: Make the lifeportal fox tool directories
+  include_tasks: copy_lifeportal_fox_tool_dirs.yml
+  when: galaxy_manage_static_setup
+
 - name: Include lifeportal_fox social_backend
   include_tasks: copy_lifeportal_fox_backend.yml
   when: galaxy_manage_static_setup

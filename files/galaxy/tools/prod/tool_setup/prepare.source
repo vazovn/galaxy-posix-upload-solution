@@ -1,0 +1,7 @@
+#Sabryr 09-02-2021
+#When a jos is submited with the current setup
+#module env is not visible. This is fixed by the script
+
+source /etc/profile.d/z00_lmod.sh
+source /etc/profile.d/z01_StdEnv.sh
+export PYTHONPATH=/cluster/galaxy/data/tools/lib:$PYTHONPATH

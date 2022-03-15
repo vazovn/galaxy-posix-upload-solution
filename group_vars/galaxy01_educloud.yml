@@ -36,10 +36,11 @@ galaxy_manage_systemd: yes
 galaxy_manage_systemd_reports: no
 
 # Server dir
-galaxy_root: /galaxy/srv/galaxy
+galaxy_root: /cluster/galaxy/srv/galaxy
+galaxy_server_dir: "{{ galaxy_root}}/server"
 
 # All data dir : job dirs, files, tmp, tools, etc.
-galaxy_lifeportal_data_dir: /galaxy/data
+galaxy_lifeportal_data_dir: /cluster/galaxy/data
 galaxy_layout: root-dir
 
 # -- Tool related dirs --
@@ -98,7 +99,7 @@ galaxy_config:
     galaxy_infrastructure_url: https://galaxy01.educloud.no
 
 #-- Cluster partition based directories -----------------------------
-    file_path: "/{{ galaxy_lifeportal_data_dir }}/files"
+    file_path: "{{ galaxy_lifeportal_data_dir }}/files"
     new_file_path: "{{ galaxy_lifeportal_data_dir }}/tmp"
     template_cache_path: "{{ galaxy_lifeportal_data_dir }}/compiled_templates"
     job_working_directory: "{{ galaxy_lifeportal_data_dir }}/jobs_directory"
@@ -108,11 +109,11 @@ galaxy_config:
 
     # SABRY's files from Lifeportal SAGA
 
-    #job_config_file: "{{ tools_root }}/tool_config/lifeportal_job_conf.xml"
-    #job_resource_params_file:  "{{ tools_root }}/tool_config/lifeportal_job_resource_conf.xml"
+    job_config_file: "{{ tools_root }}/tool_config/lifeportal_job_conf.xml"
+    job_resource_params_file:  "{{ tools_root }}/tool_config/lifeportal_job_resource_conf.xml"
     
-    job_config_file: "{{ tools_root }}/tool_config/job_conf.xml"
-    job_resource_params_file:  "{{ tools_root }}/tool_config/job_resource_params_conf.xml"
+    #job_config_file: "{{ tools_root }}/tool_config/job_conf.xml"
+    #job_resource_params_file:  "{{ tools_root }}/tool_config/job_resource_params_conf.xml"
     
     cleanup_job: never
 
@@ -129,14 +130,19 @@ galaxy_config:
 
     # SABRY's files from Lifeportal SAGA
     
-    #tool_data_table_config_path: "{{ tool_config_dir }}/lifeportal_genomes_conf.xml"
-    #tool_config_file: "{{ tool_config_dir }}/lifeportal_tool_conf.xml,{{ tool_config_dir }}/lifeportal_general_tool_conf.xml"
-    #integrated_tool_panel_config: "{{ tool_config_dir }}/integrated_tool_panel.xml"
-    #datatypes_config_file: "{{ galaxy_root }}/config/datatypes_conf.xml"
-    
-    tool_config_file: "{{ tool_config_dir }}/tool_conf.xml"
+    tool_data_table_config_path: "{{ tool_config_dir }}/lifeportal_genomes_conf.xml"
+    tool_config_file: "{{ tool_config_dir }}/lifeportal_tool_conf.xml,{{ tool_config_dir }}/lifeportal_general_tool_conf.xml"
     integrated_tool_panel_config: "{{ tool_config_dir }}/integrated_tool_panel.xml"
     datatypes_config_file: "{{ galaxy_root }}/config/datatypes_conf.xml"
+    
+    # This block is new - after 21.09. It means that the packages (the PATHs) 
+    # will be resolved as being located in the 'tool_dependency_dir' and binaries' PATH will 
+    # be derived from the <requirement> block in the respective tool wrapper file. Version is mandatory
+    
+    dependency_resolvers:
+    - type: galaxy_packages
+      versionless: false
+      base_path: "{{ tool_dependency_dir }}"
   
   uwsgi:
     socket: 127.0.0.1:8080
@@ -203,14 +209,14 @@ galaxy_config_files:
   #- src: files/galaxy/config/lifeportal_job_resource_conf.xml
     #dest: "{{ galaxy_config.galaxy.job_resource_params_file }}"
     
-  - src: files/galaxy/config/tool_conf.xml
-    dest: "{{ tool_config_dir }}/tool_conf.xml"
+  #- src: files/galaxy/config/tool_conf.xml
+    #dest: "{{ tool_config_dir }}/tool_conf.xml"
     
-  - src: files/galaxy/config/job_conf.xml
-    dest: "{{ galaxy_config.galaxy.job_config_file }}"
+  #- src: files/galaxy/config/job_conf.xml
+    #dest: "{{ galaxy_config.galaxy.job_config_file }}"
     
-  - src: files/galaxy/config/job_resource_params_conf.xml
-    dest: "{{ galaxy_config.galaxy.job_resource_params_file }}"
+  #- src: files/galaxy/config/job_resource_params_conf.xml
+    #dest: "{{ galaxy_config.galaxy.job_resource_params_file }}"
     
   - src: files/galaxy/config/datatypes_conf.xml
     dest: "{{ galaxy_root }}/config/datatypes_conf.xml"
@@ -225,6 +231,7 @@ galaxy_config_files:
 #-- Local Tools ----------------------------------------
 galaxy_local_test_tools:
   - testing_static_slurm.xml
+
   
 #-- OIDC backend items (files) ----------------------------------------
 galaxy_oidc_backend_files:

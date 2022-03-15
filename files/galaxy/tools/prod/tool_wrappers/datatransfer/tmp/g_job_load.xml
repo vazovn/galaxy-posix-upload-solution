@@ -1,0 +1,11 @@
+<tool id="g_get_from_home" name="Get data from SAGA home">
+    <requirements>
+        <requirement type="package" version="1.0.0">file_transfers</requirement>
+    </requirements>
+    <command>
+        <![CDATA[ g_get_from_home.sh '$output' ]]>
+    </command>
+   <outputs>
+       <data format="directory" name="output" />
+   </outputs>
+</tool>

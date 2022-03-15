@@ -7,7 +7,7 @@ from social_core.backends.open_id_connect import OpenIdConnectAuth
 
 class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
     name = 'lifeportalfox'
-    OIDC_ENDPOINT = 'https://research.educloud.no/login'
+    OIDC_ENDPOINT = 'https://test.api.tsd.usit.no/tsd-oidc-provider/.well-known/openid-configuration'
     EXTRA_DATA = [
         ('expires_in', 'expires_in', True),
         ('refresh_token', 'refresh_token', True),

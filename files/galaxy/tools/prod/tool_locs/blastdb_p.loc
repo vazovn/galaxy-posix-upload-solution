@@ -1,0 +1,9 @@
+# https://ftp.ncbi.nlm.nih.gov/blast/documents/blastdb.html
+env_nr_04-02-2021	Environmental protein sequences	/cluster/shared/databases/blast/latest/env_nr
+landmark_04-02-2021	Proteome of 27 model organism	/cluster/shared/databases/blast/latest/landmark
+nr_04-02-2021	Non-redundant protein sequences	/cluster/shared/databases/blast/latest/nr
+pataa_04-02-2021	Patent protein sequences	/cluster/shared/databases/blast/latest/pataa
+pdbaa_04-02-2021	PDB sequences	/cluster/shared/databases/blast/latest/pdbaa
+refseq_protein_04-02-2021	Refseq	/cluster/shared/databases/blast/latest/refseq_protein
+refseq_select_prot_04-02-2021	Refseq select	/cluster/shared/databases/blast/latest/refseq_select_prot
+swissprot_04-02-2021	Swiss-Prot	/cluster/shared/databases/blast/latest/swissprot

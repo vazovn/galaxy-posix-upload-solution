@@ -1,0 +1,4 @@
+<macros>
+    <token name="@TOOL_VERSION@">3.13.0</token>
+    <token name="@INTYPES@">fasta,fasta.gz,fastq,fastq.gz</token>
+</macros>

@@ -1,0 +1,12 @@
+<tool id="module_test" name="Test module load">
+    <command>
+        <![CDATA[hostname > "$output1"]]>
+     <!--   <![CDATA[hostname > "$output1";whoami >> "$output1"; pwd >> "$output1"; source /etc/profile.d/z00_lmod.sh; source /etc/profile.d/z01_StdEnv.sh; module list]]> -->
+    </command>
+    <inputs>
+        <param name="input1" type="data" format="txt" label="Input Dataset"/>
+    </inputs>
+    <outputs>
+        <data name="output1" format="txt" />
+    </outputs>
+</tool>

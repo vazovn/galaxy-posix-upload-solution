@@ -8,21 +8,30 @@
 - all changes are in the branch *user-systemd*
 - all patches are in the directory `user-systemd-patches`
 
+
 ## log4s issue and socks solution
 
 To run the ansible paybook from your local machine on *galaxy01.educloud.no* :
 
+- Download & compile the polipo package which sets the proxy protocol to http before sending it to sock5 proxy
+
+			wget https://www.irif.fr/~jch/software/files/polipo/polipo-1.1.1.tar.gz
+
+	This must be done on a machine which has an outbound connection 
+
+- Copy the compiled binary to galaxy01.educloud.no (`/usr/local/bin/`)
+
 - open a terminal and type:
 
-	ssh -D 12354 fox.educloud.no
+			ssh -D 12354 fox.educloud.no & polipo socksParentProxy=localhost:12354
 
 - type One-Time Code and your password
 - leave the terminal open and use another terminal
 - modify the main playbook file *galaxy-educloud.yml* file - add the proxy variable under `-hosts`
 
 	  environment:
-			http_proxy: socks5://127.0.0.1:12354
-			https_proxy: socks5://127.0.0.1:12354
+			 https_proxy: http://localhost:8123
+			 http_proxy: http://localhost:8123
     
  - patch the file 
 
@@ -34,6 +43,13 @@ To run the ansible paybook from your local machine on *galaxy01.educloud.no* :
 
     The goal of this patch is to use system-wide installed socks package. Socks is needed to fetch the galaxy code 
     from other sources but is not available in the galaxy's venv. To avoid the catch 22 we append the system-wide pythonpath 
+    
+    **Important**: If the patch does not work, and the role fails at the task _Create Galaxy virtualenv_, copy the files:
+    
+			cp /usr/lib/python3.6/site-packages/socks* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
+			cp /usr/lib/python3.6/site-packages/transitions* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
+			cp /usr/lib/python3.6/site-packages/ipaddress* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
+			cp /usr/lib/python3.6/site-packages/construct* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
 
 
 ## OpenIdc 
@@ -65,4 +81,11 @@ are made in the role *lifeportal.customized* in *tasks/main.yml*. These changes 
 		10.111.0.2	los-mgmt los-mgmt.fox
 		10.112.0.2	los-ib los-ib.fox
 
+
+## Mounting of directories
+
+- The directory `/galaxy` is a mounted directory from ESS
+		aspasia.ad.fp.educloud.no:/fp/fox01/galaxy  /galaxy    nfs rw,bg,hard,intr,tcp,nfsvers=3
+- The directory `/cluster`is a mounted directory from FOX
+		aspasia.ad.fp.educloud.no:/fp/fox01  /cluster    nfs ro,bg,hard,intr,tcp,nfsvers=3
 
