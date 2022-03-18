@@ -3,6 +3,12 @@
 - name: Set welcome page
   include_tasks: copy_welcome_page.yml
   when: galaxy_manage_static_setup
+  
+# Task "Copy LMOD activation scripts" is deactivated now. Can be used in future setups
+
+#- name: Copy LMOD activation scripts
+  #include_tasks: copy_lifeportal_fox_lmod_activation_scripts.yml
+  #when: galaxy_manage_static_setup
 
 - name: Make the lifeportal fox tool directories
   include_tasks: copy_lifeportal_fox_tool_dirs.yml

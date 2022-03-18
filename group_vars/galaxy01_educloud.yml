@@ -70,6 +70,7 @@ galaxy_config:
     admin_users: flbernal@usit.uio.no,n.a.vazov@usit.uio.no
     database_connection: "postgresql:///galaxy?host=/var/run/postgresql"
     check_migrate_tools: false
+    use_remote_user: false
     allow_user_impersonation: true
     require_login: true
     allow_user_dataset_purge: true
@@ -236,6 +237,11 @@ galaxy_local_test_tools:
 #-- OIDC backend items (files) ----------------------------------------
 galaxy_oidc_backend_files:
   - lifeportal_fox.py
+
+#-- LMOD activation scripts ----------------------------------------
+#lmod_activation_scripts:
+# - z00_lmod.sh
+#  - z01_StdEnv.sh
 
 #-- Local  Interactive Tools -------------------------------
 

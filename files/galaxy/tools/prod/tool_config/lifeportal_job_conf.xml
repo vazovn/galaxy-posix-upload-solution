@@ -26,7 +26,7 @@
      </destinations>
      
      <tools>
-        <tool id="upload" destination="local" resources="fox"/>
+        <tool id="upload" destination="local"/>
        
         <tool id="g_squeue" destination="generate_slurm_job_params" resources="fox"/>
         <tool id="g_get_from_home" destination="generate_slurm_job_params" resources="fox_home"/>

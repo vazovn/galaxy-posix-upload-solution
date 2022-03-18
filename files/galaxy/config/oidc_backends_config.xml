@@ -57,6 +57,7 @@ Please mind `http` and `https`.
         <client_id>TSD_CLIENT_ID</client_id>
         <client_secret>TSD_CLIENT_SECRET</client_secret>
         <redirect_uri>http://galaxy01.educloud.no/authnz/lifeportalfox/callback</redirect_uri>
+        <url>https://test.api.tsd.usit.no/tsd-oidc-provider</url>
         <prompt>consent</prompt>
         <icon>https://www.usit.uio.no/bilder/fox_man2.png?vrtx=thumbnail</icon>
         <!-- (Optional) Extra scopes you need to request for your implementation -->
