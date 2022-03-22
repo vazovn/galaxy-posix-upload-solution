@@ -1,5 +1,7 @@
 - src: galaxyproject.galaxy
   version: 0.9.17
+- src: galaxyproject.gxadmin
+  version: 0.0.8
 #- src: galaxyproject.postgresql
 #  version: 1.0.3
 #- src: natefoo.postgresql_objects
