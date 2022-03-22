@@ -22,6 +22,7 @@
       become: yes
       become_user: root
     - centos.nginx
+    - galaxyproject.gxadmin
 
   environment:
     #http_proxy: socks5://127.0.0.1:12354

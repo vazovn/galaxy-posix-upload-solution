@@ -88,4 +88,19 @@ are made in the role *lifeportal.customized* in *tasks/main.yml*. These changes 
 		aspasia.ad.fp.educloud.no:/fp/fox01/galaxy  /galaxy    nfs rw,bg,hard,intr,tcp,nfsvers=3
 - The directory `/cluster`is a mounted directory from FOX
 		aspasia.ad.fp.educloud.no:/fp/fox01  /cluster    nfs ro,bg,hard,intr,tcp,nfsvers=3
+		
+		
+## Monitoring and reports
 
+The program _gxadmin_ allows the admin (as _galaxy_ user) to query the framework for various parameteres. It is installed as a separate role `galaxyproject.gxadmin` which is set in the `requirements.yml`. To use it set the PGDATABASE variable in `.bashrc`for _galaxy_ user.
+
+		export PGDATABASE=galaxy
+		
+Then run the commands like
+
+		gxadmin query latest-users
+		gxadmin query job-info
+		
+etc.
+
+For more info see: *https://training.galaxyproject.org/training-material/topics/admin/tutorials/gxadmin/tutorial.html*
