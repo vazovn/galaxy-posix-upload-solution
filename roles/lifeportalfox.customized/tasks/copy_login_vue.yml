@@ -1,0 +1,7 @@
+---
+
+- name: Copy Login vue file
+  copy:
+    src: "files/galaxy/web_files/Login.vue"
+    dest: "{{ galaxy_server_dir }}/client/src/components/login/" 
+  when: galaxy_server_dir is defined

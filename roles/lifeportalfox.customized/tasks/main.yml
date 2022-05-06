@@ -10,6 +10,30 @@
   #include_tasks: copy_lifeportal_fox_lmod_activation_scripts.yml
   #when: galaxy_manage_static_setup
 
+- name: Modify Login vue file
+  include_tasks: copy_login_vue.yml
+  when: galaxy_manage_static_setup
+  
+- name: Modify Makefile in galaxy server directory
+  lineinfile:
+    path: "{{ galaxy_server_dir }}/Makefile"
+    backup: yes
+    state: present
+    insertafter : "^YARN_INSTALL_OPTS"
+    line: "{{ item }}"
+  with_items:
+   - 'HTTPS_PROXY=http://localhost:8123'
+   - 'HTTP_PROXY=http://localhost:8123'
+
+- name: Run make client again after Modify Login vue file and Modify Makefile
+  shell: "source  /cluster/galaxy/srv/galaxy/venv/bin/activate && cd /cluster/galaxy/srv/galaxy/server && /usr/bin/make client"
+  #command: "chdir={{ galaxy_server_dir }} {{ item }}"
+  #with_items:
+  #- source /cluster/galaxy/srv/galaxy/venv/bin/activate
+  #- /usr/bin/make client
+  #- deactivate
+
+
 - name: Make the lifeportal fox tool directories
   include_tasks: copy_lifeportal_fox_tool_dirs.yml
   when: galaxy_manage_static_setup
