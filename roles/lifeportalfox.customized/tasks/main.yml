@@ -4,6 +4,10 @@
   include_tasks: copy_welcome_page.yml
   when: galaxy_manage_static_setup
   
+- name: Change favicon png file put fox icon
+  include_tasks: copy_favicon_png.yml
+  when: galaxy_manage_static_setup  
+  
 # Task "Copy LMOD activation scripts" is deactivated now. Can be used in future setups
 
 #- name: Copy LMOD activation scripts
@@ -28,9 +32,9 @@
 - name: Run make client again after Modify Login vue file and Modify Makefile
   shell: "source  /cluster/galaxy/srv/galaxy/venv/bin/activate && cd /cluster/galaxy/srv/galaxy/server && /usr/bin/make client"
 
-- name: Make the lifeportal fox tool directories
-  include_tasks: copy_lifeportal_fox_tool_dirs.yml
-  when: galaxy_manage_static_setup
+#- name: Make the lifeportal fox tool directories
+  #include_tasks: copy_lifeportal_fox_tool_dirs.yml
+  #when: galaxy_manage_static_setup
 
 - name: Include lifeportal_fox social_backend
   include_tasks: copy_lifeportal_fox_backend.yml
