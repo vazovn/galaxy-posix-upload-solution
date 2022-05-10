@@ -21,7 +21,7 @@
                                     </b-form-group>
 									<b-form-group label="Educloud project required">
 											<b-form-text>
-												To use Lifeportal, please apply first for an educloud project
+												To use Lifeportal, please apply first for an educloud project (click on the icon below)
 												</p>
 												<a href="https://research.educloud.no/login"><img src="https://research.educloud.no/_next/static/images/logo-text-ee0d4c59633474b318e00573994c7e60.svg" width="100"  height="20"></a>
 												</p>

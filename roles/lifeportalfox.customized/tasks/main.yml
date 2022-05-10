@@ -32,6 +32,7 @@
 - name: Run make client again after Modify Login vue file and Modify Makefile
   shell: "source  /cluster/galaxy/srv/galaxy/venv/bin/activate && cd /cluster/galaxy/srv/galaxy/server && /usr/bin/make client"
 
+## === This task will be used to install tools  === ##
 #- name: Make the lifeportal fox tool directories
   #include_tasks: copy_lifeportal_fox_tool_dirs.yml
   #when: galaxy_manage_static_setup
