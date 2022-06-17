@@ -10,22 +10,20 @@
                                 <div>
                                     <!-- standard internal galaxy login -->
                                     <b-form-group label="How to log in">
-											<b-form-text>
-												To log into Lifeportal read this block and then click on the FOX icon below.
-											</b-form-text>
-                                    </b-form-group>
-                                     <b-form-group label="Two-factor authentication (2FA)">
-											<b-form-text>
-												The Lifeportal service uses two-factor authentication. Please install Google, Microsoft or another authenticator on your smartphone
-											</b-form-text>
-                                    </b-form-group>
-									<b-form-group label="Educloud project required">
-											<b-form-text>
-												To use Lifeportal, please apply first for an educloud project (click on the icon below)
-												</p>
-												<a href="https://research.educloud.no/login"><img src="https://research.educloud.no/_next/static/images/logo-text-ee0d4c59633474b318e00573994c7e60.svg" width="100"  height="20"></a>
-												</p>
-												 and scan the QR-code for 2FA
+												<b-form-text>
+																1. Apply for access to an educloud project : click on the educloud research icon below 
+																</p>
+																			<a href="https://research.educloud.no/login"><img src="https://research.educloud.no/_next/static/images/logo-text-ee0d4c59633474b318e00573994c7e60.svg" width="100"  height="20" class="center" ></a>
+																</p>
+																and select project <font color="red">ec73</font> at the next screen
+																		</p>
+											    </b-form-text>
+											    <b-form-text>
+																2. Install Google, Microsoft or another authenticator on your smartphone and scan the QR-code for 2 factor authentication (2FA)
+																</p>
+												</b-form-text>
+												<b-form-text>
+																3. Click on the Fox icon below to  log in
 											</b-form-text>
                                     </b-form-group>
                                 </div>

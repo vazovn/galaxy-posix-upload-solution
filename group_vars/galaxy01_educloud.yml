@@ -67,7 +67,7 @@ galaxy_config:
   galaxy:
 #--Admin-------------------------------------------------
     brand: "FOX-portal"
-    admin_users: flbernal@usit.uio.no,n.a.vazov@usit.uio.no
+    admin_users: flbernal@usit.uio.no,n.a.vazov@usit.uio.no,nikolaiv@uio.no,sabryr@uio.no
     database_connection: "postgresql:///galaxy?host=/var/run/postgresql"
     check_migrate_tools: false
     use_remote_user: false

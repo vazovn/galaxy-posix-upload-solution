@@ -1,5 +1,7 @@
 ---
 
-- name: Set default welcome page
-  command: cp "{{ galaxy_server_dir }}/static/welcome.html.sample" "{{ galaxy_server_dir }}/static/welcome.html"
+- name: Copy welcome page
+  copy:
+    src: "files/galaxy/web_files/welcome.html.fox"
+    dest: "{{ galaxy_server_dir }}/static/welcome.html"
   when: galaxy_server_dir is defined

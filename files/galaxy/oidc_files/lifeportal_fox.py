@@ -28,7 +28,7 @@ from requests import request, ConnectionError
 
 class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
     name = 'lifeportalfox'
-    OIDC_ENDPOINT = 'https://oidc.tsd.usit.no/tsd-oidc-provider'
+    OIDC_ENDPOINT = 'https://oidc.fp.educloud.no/ec-oidc-provider'
     EXTRA_DATA = [
         ('expires_in', 'expires_in', True),
         ('refresh_token', 'refresh_token', True),

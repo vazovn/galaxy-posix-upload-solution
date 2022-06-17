@@ -23,7 +23,7 @@ To run the ansible paybook from your local machine on *galaxy01.educloud.no* :
 
 - open a terminal as ( with One-Time Code and your password) and type:
 
-			ssh -D 12354 fox.educloud.no & polipo socksParentProxy=localhost:12354
+			ssh -D 12354 fox.educloud.no & polipo socksParentProxy=localhost:12354 localDocumentRoot=""  proxyPort=3128 &
 
 - leave the terminal open and use another terminal
 
@@ -50,6 +50,14 @@ To run the ansible paybook from your local machine on *galaxy01.educloud.no* :
 			cp /usr/lib/python3.6/site-packages/transitions* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
 			cp /usr/lib/python3.6/site-packages/ipaddress* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
 			cp /usr/lib/python3.6/site-packages/construct* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
+
+
+## PostgreSQL backup disable
+
+Comment the backup of he DB in  `galaxyproject.postgresql/tasks/main.yml`
+
+			#- include_tasks: backup.yml
+			#  when: postgresql_backup_dir is defined
 
 
 ## OpenIdc 

@@ -1,4 +1,0 @@
-- name: restart galaxy
-  service:
-    name: galaxy
-    state: restarted

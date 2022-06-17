@@ -7,14 +7,14 @@
   with_items: "{{ galaxy_oidc_backend_files | default([]) }}"
   when:  galaxy_oidc_backend_files is defined
   
-- name: Replace TSD_CLIENT_ID variable
+- name: Replace CLIENT_ID variable
   ansible.builtin.replace:
     path: "{{ galaxy_root }}/config/oidc_backends_config.xml"
-    regexp: 'TSD_CLIENT_ID'
-    replace: "{{ TSD_CLIENT_ID }}"
+    regexp: 'CLIENT_ID'
+    replace: "{{ CLIENT_ID }}"
     
-- name: Replace TSD_CLIENT_SECRET variable
+- name: Replace CLIENT_SECRET variable
   ansible.builtin.replace:
     path: "{{ galaxy_root }}/config/oidc_backends_config.xml"
-    regexp: 'TSD_CLIENT_SECRET'
-    replace:  "{{ TSD_CLIENT_SECRET }}"
+    regexp: 'CLIENT_SECRET'
+    replace:  "{{ CLIENT_SECRET }}"

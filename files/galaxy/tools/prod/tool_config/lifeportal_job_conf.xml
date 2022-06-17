@@ -12,22 +12,17 @@
             <param id="type">python</param>
             <param id="function">integrate_job_destination_params</param>
         </destination>
-        <destination id="transcriptome" runner="dynamic">
-           <param id="type">python</param>
-           <param id="function">is_user_in_role</param>
-        </destination>
         <!-- This is a destination with fixed destination params - used to test connection to cluster -->
         <destination id="slurm_static" runner="slurm">
-          <param id="nativeSpecification">--account=ec12 --time=05:00 --mem-per-cpu=2 --nodes=1 --ntasks-per-node=1</param>
+          <param id="nativeSpecification">--account=ec73 --time=05:00 --mem-per-cpu=2 --nodes=1 --ntasks-per-node=1</param>
         </destination>
         <destination id="slurm_minimal" runner="slurm">
-          <param id="nativeSpecification">--account=ec12 --time=10:00 --mem-per-cpu=1024 --nodes=1 --ntasks=1</param>
+          <param id="nativeSpecification">--account=ec73 --time=10:00 --mem-per-cpu=1024 --nodes=1 --ntasks=1</param>
         </destination>
      </destinations>
      
      <tools>
         <tool id="upload" destination="local"/>
-       
         <tool id="g_squeue" destination="generate_slurm_job_params" resources="fox"/>
         <tool id="g_get_from_home" destination="generate_slurm_job_params" resources="fox_home"/>
         <tool id="testing" destination="generate_slurm_job_params" resources="fox"/>
