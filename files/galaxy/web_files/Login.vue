@@ -5,7 +5,7 @@
                 <div class="col col-lg-6">
                     <b-alert :show="messageShow" :variant="messageVariant" v-html="messageText" />
                     <b-form id="login" @submit.prevent="submitGalaxyLogin()">
-                        <b-card no-body header="Welcome to Lifeportal-Galaxy on the FOX cluster at UiO">
+                        <b-card no-body header="Welcome to the Galaxy-FOX : the Galaxy portal to the Fox cluster at UiO">
                             <b-card-body>
                                 <div>
                                     <!-- standard internal galaxy login -->
@@ -23,7 +23,7 @@
 																</p>
 												</b-form-text>
 												<b-form-text>
-																3. Click on the Fox icon below to  log in
+																3. When ready with previous steps, click on the Fox icon below to  log in
 											</b-form-text>
                                     </b-form-group>
                                 </div>
