@@ -1,7 +1,10 @@
 ---
 
-- name: Copy lifeportal fox tool directories
-  copy:
-    src: "files/galaxy/tools/prod/"
+- name: Pull the tool directories from Sabry tool repo
+  ansible.builtin.git:
+    #repo: git@github.uio.no:nikolaivIT-ITF/sw-portals-team-lifeportal-fox-tools.git
+    repo: https://nikolaiv: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@github.uio.no/IT-ITF/sw-portals-team-lifeportal-fox-tools.git
     dest: "{{ tools_root }}" # /cluster/galaxy/data/tools/prod
+    clone: no
+    update: yes
   when:  tools_root is defined
