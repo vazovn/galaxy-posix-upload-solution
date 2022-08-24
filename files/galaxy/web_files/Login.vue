@@ -26,9 +26,6 @@
 																3. When ready with previous steps, click on the Fox icon below to  log in
 																</p>
 											</b-form-text>
-											<b-form-text>
-																4. If you have any questions, please write to <a href="mailto:hpc-drift@usit.uio.no">hpc-drift@usit.uio.no</a>
-											</b-form-text>
                                     </b-form-group>
                                 </div>
                                 <div v-if="enable_oidc">
