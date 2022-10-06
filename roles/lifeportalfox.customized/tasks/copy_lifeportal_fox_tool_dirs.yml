@@ -2,7 +2,7 @@
 
 - name: Pull the tool directories from Sabry tool repo
   git:
-    repo: https://nikolaiv:<TOKEN>@github.uio.no/IT-ITF/sw-portals-team-lifeportal-fox-tools.git
+    repo: https://nikolaiv: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@github.uio.no/IT-ITF/sw-portals-team-lifeportal-fox-tools.git
     dest: "{{ tools_root }}" # /cluster/galaxy/data/tools/prod
     update: yes
     version: master
