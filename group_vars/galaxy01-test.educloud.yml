@@ -7,7 +7,7 @@ pip_package: python3-pip                               # geerlingguy.pip
 postgresql_objects_users:
   - name: ec-galaxy
 postgresql_objects_databases:
-  - name: galaxy
+  - name: galaxytest
     owner: ec-galaxy
 postgresql_pg_hba_local_socket : true    
 
@@ -20,8 +20,8 @@ postgresql_pg_hba_local_socket : true
 ### variables that are used in the galaxy.conf templates
 ### if no ssl, leave the ssl_cert_path and ssl_key_path empty
 use_ssl: true
-ssl_cert_path: /etc/pki/tls/certs/galaxy01_educloud_no.crt
-ssl_key_path: /etc/pki/tls/private/galaxy01.educloud.no.key
+ssl_cert_path: /etc/pki/tls/certs/galaxy01_educloud_no.crt ################# TO DO ################
+ssl_key_path: /etc/pki/tls/private/galaxy01.educloud.no.key ################# TO DO ################
 
 # Galaxy
 
@@ -36,11 +36,11 @@ galaxy_manage_systemd: yes
 galaxy_manage_systemd_reports: no
 
 # Server dir
-galaxy_root: /cluster/galaxy/srv/galaxy
+galaxy_root: /cluster/galaxy-test/srv/galaxy
 galaxy_server_dir: "{{ galaxy_root}}/server"
 
 # All data dir : job dirs, files, tmp, tools, etc.
-galaxy_lifeportal_data_dir: /cluster/galaxy/data
+galaxy_lifeportal_data_dir: /cluster/galaxy-test/data
 galaxy_layout: root-dir
 
 # -- Tool related dirs --
@@ -66,9 +66,9 @@ galaxy_oidc_backend_files_target_dir: "{{ galaxy_venv_dir }}/lib64/python3.6/sit
 galaxy_config:
   galaxy:
 #--Admin-------------------------------------------------
-    brand: "FOX-portal"
+    brand: "TEST-FOX-portal"
     admin_users: flbernal@usit.uio.no,n.a.vazov@usit.uio.no,nikolaiv@uio.no,sabryr@uio.no
-    database_connection: "postgresql:///galaxy?host=/var/run/postgresql"
+    database_connection: "postgresql:///galaxytest?host=/var/run/postgresql"
     check_migrate_tools: false
     use_remote_user: false
     allow_user_impersonation: true
@@ -101,7 +101,7 @@ galaxy_config:
 
 #--Standard Config-------------------------------------------
     welcome_url: /static/welcome.html
-    galaxy_infrastructure_url: https://galaxy01.educloud.no
+    galaxy_infrastructure_url: https://galaxy01-test.educloud.no
 
 #-- Cluster partition based directories -----------------------------
     file_path: "{{ galaxy_lifeportal_data_dir }}/files"

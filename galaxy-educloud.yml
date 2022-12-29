@@ -1,12 +1,13 @@
 ---
-- hosts: galaxy01_educloud
+- hosts: galaxy01_educloud_test
   become: true
   vars:
       galaxy_diff_mode_verbose: true
-      CLIENT_ID:  "{{ lookup('file', '/uio/kant/usit-ft-u1/nikolaiv/galaxy-fox-oidc-secrets/client_id') }}"
-      CLIENT_SECRET:  "{{ lookup('file', '/uio/kant/usit-ft-u1/nikolaiv/galaxy-fox-oidc-secrets/client_secret') }}"
+      CLIENT_ID:  "{{ lookup('file', '/uio/kant/usit-ft-u1/nikolaiv/galaxy-fox-oidc-secrets/client_test_id') }}"
+      CLIENT_SECRET:  "{{ lookup('file', '/uio/kant/usit-ft-u1/nikolaiv/galaxy-fox-oidc-secrets/client_test_secret') }}"
   roles:
-    - galaxyproject.postgresql
+    - role: galaxyproject.postgresql
+      __postgresql_version_dotless:  ""
     - role: natefoo.postgresql_objects
       become: true
       become_user: postgres
@@ -24,11 +25,11 @@
     - centos.nginx
     - galaxyproject.gxadmin
 
-  environment:
+#  environment:
     #http_proxy: socks5://127.0.0.1:12354
     #https_proxy: socks5://127.0.0.1:12354
-    https_proxy: http://localhost:3128  #8123 is the default polipo port - now polipo runs on 3128 which is the update.uio.no proxy for yum
-    http_proxy: http://localhost:3128  #8123 is the default polipo port - now polipo runs on 3128 which is the update.uio.no proxy for yum
+    #https_proxy: http://localhost:3128  #8123 is the default polipo port - now polipo runs on 3128 which is the update.uio.no proxy for yum
+    # http_proxy: http://localhost:3128  #8123 is the default polipo port - now polipo runs on 3128 which is the update.uio.no proxy for yum
     
     # Enable the following variable in the terminal of the remote host (galaxy01.edicloud.no) in order to run
     # systemctl --user status galaxy and othe systemctl commands as ec-galaxy user
