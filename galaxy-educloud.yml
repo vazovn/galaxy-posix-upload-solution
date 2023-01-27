@@ -5,35 +5,38 @@
       galaxy_diff_mode_verbose: true
       CLIENT_ID:  "{{ lookup('file', '/uio/kant/usit-ft-u1/nikolaiv/galaxy-fox-oidc-secrets/client_test_id') }}"
       CLIENT_SECRET:  "{{ lookup('file', '/uio/kant/usit-ft-u1/nikolaiv/galaxy-fox-oidc-secrets/client_test_secret') }}"
+  pre_tasks:
+    - name: Install Dependencies
+      package:
+        name: ['acl', 'bzip2', 'git', 'make', 'python3-psycopg2', 'tar', 'virtualenv']
+    - name: Enable or reenable linger for ec-galaxy user
+      shell:
+            "if [[ $(loginctl list-users | grep 'ec-galaxy') == *2100096* ]]; then loginctl disable-linger ec-galaxy && sleep 5 && loginctl enable-linger ec-galaxy; else loginctl enable-linger ec-galaxy; fi"
+      become_user: "{{ galaxy_user }}"
   roles:
     - role: galaxyproject.postgresql
       __postgresql_version_dotless:  ""
-    - role: natefoo.postgresql_objects
+    - role: galaxyproject.postgresql_objects
       become: true
       become_user: postgres
     - geerlingguy.pip
     - role: galaxyproject.galaxy
       become: true
-      become_user: "{{ galaxy_user.name }}"
+      become_user: "{{ galaxy_user }}"
       # customized tasks
     - role: lifeportalfox.customized
       become: true
-      become_user: "{{ galaxy_user.name }}"
+      become_user: "{{ galaxy_user }}"
     - role: slurmdrmaa.galaxy
       become: yes
       become_user: root
     - centos.nginx
     - galaxyproject.gxadmin
 
-#  environment:
-    #http_proxy: socks5://127.0.0.1:12354
-    #https_proxy: socks5://127.0.0.1:12354
-    #https_proxy: http://localhost:3128  #8123 is the default polipo port - now polipo runs on 3128 which is the update.uio.no proxy for yum
-    # http_proxy: http://localhost:3128  #8123 is the default polipo port - now polipo runs on 3128 which is the update.uio.no proxy for yum
     
     # Enable the following variable in the terminal of the remote host (galaxy01.edicloud.no) in order to run
     # systemctl --user status galaxy and othe systemctl commands as ec-galaxy user
-    #XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user.uid }}"
+    # XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user.uid }}"
     # export XDG_RUNTIME_DIR=/run/user/2100096
     ## Then as ec-galaxy user run
     ## systemctl --user status galaxy

@@ -33,11 +33,20 @@ galaxy_manage_mutable_setup: true
 galaxy_manage_database: true
 galaxy_fetch_dependencies: true
 galaxy_manage_systemd: yes
+
+# If installing on a root_squash, you need to enable the galaxy user to set up the galaxy.service
+# and set galaxy_systemd_root to false, ..tasks/systemd_galaxy.yml is defining this
+galaxy_systemd_root: false
+
 galaxy_manage_systemd_reports: no
+
+# If the host needs a tunnel to connect to the external world, set to true.
+# It will run the task "Modify Makefile in galaxy server directory" in lifeportalfox.customized role
+galaxy_use_tunnel: false
 
 # Server dir
 galaxy_root: /cluster/galaxy-test/srv/galaxy
-galaxy_server_dir: "{{ galaxy_root}}/server"
+galaxy_server_dir: "{{ galaxy_root }}/server"
 
 # All data dir : job dirs, files, tmp, tools, etc.
 galaxy_lifeportal_data_dir: /cluster/galaxy-test/data
@@ -47,14 +56,19 @@ galaxy_layout: root-dir
 tools_root: "{{ galaxy_lifeportal_data_dir }}/tools/prod"
 tool_config_dir: "{{ tools_root }}/tool_config"
 tool_data_path: "{{ tools_root }}/tool_locs"
-tool_dependency_cache_dir: "{{ tools_root}}//tool_dependencies/_cache"
+tool_dependency_cache_dir: "{{ tools_root }}//tool_dependencies/_cache"
 tool_dependency_dir: "{{ tools_root }}/tool_dependencies"
 tool_cache_data_dir: "{{ galaxy_root }}/var/cache/tool_cache"
 tool_search_index_dir: "{{ galaxy_root }}/var/cache/tool_search_index"
 
 #----------------------------------------------------------------------
-galaxy_user: {name: ec-galaxy, shell: /bin/bash, uid: 2100096}
-galaxy_group: {name: ec-galaxy-group, gid: 2100210}
+#galaxy_user: {name: ec-galaxy, shell: /bin/bash, uid: 2100096}
+galaxy_user: ec-galaxy
+galaxy_user_id: 2100096
+#galaxy_group: {name: ec-galaxy-group, gid: 2100210}
+galaxy_group: ec-galaxy-group
+galaxy_group_id: 2100210
+galaxy_privsep_user: "{{ galaxy_user }}"
 #---------------------------------------------------------------------
 galaxy_commit_id: release_21.09
 galaxy_force_checkout: true

@@ -19,6 +19,8 @@
   include_tasks: copy_login_vue.yml
   when: galaxy_manage_static_setup
 
+## The following task is necessary only when the host has no connection to the outside world!!
+## Activate 'galaxy_use_tunnel' in the group_vars/galaxy01_educloud_test.yml
 - name: Modify Makefile in galaxy server directory
   lineinfile:
     path: "{{ galaxy_server_dir }}/Makefile"
@@ -29,6 +31,7 @@
   with_items:
    - 'HTTPS_PROXY=http://localhost:3128'
    - 'HTTP_PROXY=http://localhost:3128'
+  when: galaxy_use_tunnel
 
 - name: Run make client again after Modify Login vue file and Modify Makefile
   shell: "source  /cluster/galaxy-test/srv/galaxy/venv/bin/activate && cd /cluster/galaxy-test/srv/galaxy/server && /usr/bin/make client"

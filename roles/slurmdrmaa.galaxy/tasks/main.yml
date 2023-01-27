@@ -13,8 +13,8 @@
     src: "{{ role_path }}/files/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz"
     dest: /tmp/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz
     mode: ugo+rw
-    owner: "{{ galaxy_user.name }}"
-    group: "{{ galaxy_group.name }}"
+    owner: "{{ galaxy_user }}"
+    group: "{{ galaxy_group }}"
     
 - name: Copy slurm-drmaa conf
   copy:
@@ -28,7 +28,7 @@
   unarchive:
       src: "/tmp/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz"
       dest: "/tmp"
-      owner: "{{ galaxy_user.name }}"
+      owner: "{{ galaxy_user }}"
       remote_src: yes
       mode: 01777
     
@@ -40,12 +40,12 @@
     LD_LIBRARY_PATH: '$LD_LIBRARY_PATH:/usr/lib64'
     CXXFLAGS: "-g -00"
   become: yes
-  become_user: "{{ galaxy_user.name }}"
+  become_user: "{{ galaxy_user }}"
     
 - name: Running "make" for slurm-drmaa
   command: 'make chdir=/tmp/slurm-drmaa-{{ slurm_drmaa_version }}'
   become: yes
-  become_user: "{{ galaxy_user.name }}"
+  become_user: "{{ galaxy_user }}"
 
 - name: Running "make install" for slurm-drmaa
   command: 'make install chdir=/tmp/slurm-drmaa-{{ slurm_drmaa_version }}'

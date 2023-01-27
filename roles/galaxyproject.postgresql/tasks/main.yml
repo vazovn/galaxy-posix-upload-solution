@@ -87,8 +87,8 @@
     backup: yes
   notify: Reload PostgreSQL
 
-#- include_tasks: backup.yml
-#  when: postgresql_backup_dir is defined
+- include_tasks: backup.yml
+  when: postgresql_backup_dir is defined
 
 - name: Ensure PostgreSQL is running
   service:

@@ -14,19 +14,15 @@
   environment:
     VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
 
-- name: Ensure pip and setuptools are the latest release
+- name: Ensure pip is the desired release
   pip:
     name: pip
-    state: latest
+    state: "{{ galaxy_pip_version | default('latest') }}"
     extra_args: "{{ pip_extra_args | default('') }}"
     virtualenv: "{{ galaxy_venv_dir }}"
     virtualenv_command: "{{ galaxy_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
   environment:
-    #PYTHONPATH:  null
-    # In order to use system-wide installed socks we need to set the PYTHONPATH  to both venv one and the system wide one
-    # The venv one is /galaxy/srv/galaxy/venv/lib/python3.6/site-packages/
-    # The system one is : /usr/lib/python3.6/site-packages/
-    PYTHONPATH:  "{{ galaxy_venv_dir }}/lib/python3.6/site-packages/:/usr/lib/python3.6/site-packages/"
+    PYTHONPATH: null
     VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
 
 - name: Ensure setuptools is latest working release (<58)
@@ -37,9 +33,5 @@
     virtualenv: "{{ galaxy_venv_dir }}"
     virtualenv_command: "{{ galaxy_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
   environment:
-    #PYTHONPATH: null
-    # In order to use system-wide installed socks we need to set the PYTHONPATH  to both venv one and the system wide one
-    # The venv one is /galaxy/srv/galaxy/venv/lib/python3.6/site-packages/
-    # The system one is : /usr/lib/python3.6/site-packages/
-    PYTHONPATH:  "{{ galaxy_venv_dir }}/lib/python3.6/site-packages/:/usr/lib/python3.6/site-packages/"
+    PYTHONPATH: null
     VIRTUAL_ENV: "{{ galaxy_venv_dir }}"

@@ -71,6 +71,11 @@ If using `root-dir`:
 
 ### Optional variables ###
 
+The `galaxy_config_perms` option controls the permissions that Galaxy configuration files will be set to. This option
+has been added in version 0.9.18 of the role and the default value is `0640` (user read-write, group read-only, other
+users have no permissions). **In older versions, the role did not control the permissions of configuration files, so be
+aware that your configuration file permissions may change as of 0.9.18 and later.**
+
 **Layout control**
 
 - `galaxy_layout`: available layouts can be found in the [vars/][vars] subdirectory and possible values include:
@@ -89,6 +94,16 @@ Options below that control individual file or subdirectory placement can still o
 [vars]: vars/
 [custom]: vars/layout-custom.yml
 [fhs]: http://www.pathname.com/fhs/
+
+**New options for Galaxy 22.01 and later**
+
+The role can now manage the Galaxy service using [gravity][gravity]. This is the default for Galaxy 22.05 and later.
+Additionally, support for the `galaxy_restart_handler_name` variable has been removed. If you need to enable your own
+custom restart handler, you can use the "`listen`" option to the handler as explained in the
+[handler documentation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_handlers.html#using-variables-with-handlers).
+The handler should "listen" to the topic `"restart galaxy"`.
+
+[gravity]: https://github.com/galaxyproject/gravity
 
 **New options for Galaxy 18.01 and later**
 
@@ -218,10 +233,13 @@ Several variables control which functions this role will perform (all default to
 - `galaxy_build_client`: Build the Galaxy client application (web UI).
 - `galaxy_client_make_target` (default: `client-production-maps`): Set the client build type. Options include: `client`,
   `client-production` and `client-production-maps`. See [Galaxy client readme][client-build] for details.
+- `galaxy_manage_systemd` (default: `no`): Install a [systemd][systemd] service unit to start and stop Galaxy with the
+  system (and using the `systemctl` command).
 - `galaxy_manage_errordocs` (default: `no`): Install Galaxy-styled 413 and 502 HTTP error documents for nginx. Requires
   write privileges for the nginx error document directory.
 
 [client-build]: https://github.com/galaxyproject/galaxy/blob/dev/client/README.md#complete-client-build
+[systemd]: https://www.freedesktop.org/wiki/Software/systemd/
 
 **Galaxy code and configuration**
 
@@ -318,6 +336,23 @@ The role needs to perform tasks as different users depending on which features y
 connecting to the target host. By default, the role will use `become` (i.e. sudo) to perform tasks as the appropriate
 user if deemed necessary. Overriding this behavior is discussed in the [defaults file][defaults].
 
+**systemd**
+
+[systemd][systemd] is the standard system init daemon on most modern Linux flavors (and all of the ones supported by
+this role). If `galaxy_manage_systemd` is enabled, a `galaxy` service will be configured in systemd to run Galaxy. This
+service will be automatically started and configured to start when your system boots. You can control the Galaxy
+service with the `systemctl` utility as the `root` user or with `sudo`:
+
+```console
+# systemctl start galaxy     # start galaxy
+# systemctl reload galaxy    # attempt a "graceful" reload
+# systemctl restart galaxy   # perform a hard restart
+# systemctl stop galaxy      # stop galaxy
+```
+
+You can use systemd user mode if you do not have root privileges on your system by setting `galaxy_systemd_root` to
+`false`. Add `--user` to the `systemctl` commands above to interact with systemd in user mode:
+
 **Error documents**
 
 - `galaxy_errordocs_dir`: Install Galaxy-styled HTTP 413 and 502 error documents under this directory. The 502 message
@@ -329,9 +364,6 @@ user if deemed necessary. Overriding this behavior is discussed in the [defaults
 
 **Miscellaneous options**
 
-- `galaxy_restart_handler_name`: The role doesn't restart Galaxy since it doesn't control how Galaxy is started and
-  stopped. Because of this, you can write your own restart handler and inform the role of your handler's name with this
-  variable. See the examples
 - `galaxy_admin_email_to`: If set, email this address when Galaxy has been updated. Assumes mail is properly configured
   on the managed host.
 - `galaxy_admin_email_from`: Address to send the aforementioned email from.
@@ -355,10 +387,10 @@ Install Galaxy on your local system with all the default options:
   connection: local
   roles:
      - galaxyproject.galaxy
-```  
-  
+```
+
 If your Ansible version >= 2.10.4, then when you run `ansible-playbook playbook.yml` you should supply an extra argument `-u $USER`, otherwise you will get an error.
-  
+
 Once installed, you can start with:
 
 ```console
@@ -393,7 +425,6 @@ Install Galaxy as per the current production server best practices:
     galaxy_user: galaxy
     galaxy_privsep_user: gxpriv
     galaxy_group: galaxy
-    galaxy_restart_handler_name: Restart Galaxy
     postgresql_objects_users:
       - name: galaxy
         password: null
@@ -448,6 +479,7 @@ Install Galaxy as per the current production server best practices:
       supervisorctl:
         name: galaxy
         state: restarted
+      listen: restart galaxy
 ```
 
 License
@@ -467,4 +499,4 @@ This role was written and contributed to by the following people:
 - [Simon Belluzzo](https://github.com/simonalpha)
 - [John Chilton](https://github.com/jmchilton)
 - [Nate Coraor](https://github.com/natefoo)
-- [Helena Rasche](https://github.com/erasche)
+- [Helena Rasche](https://github.com/hexylena)
