@@ -20,8 +20,8 @@ postgresql_pg_hba_local_socket : true
 ### variables that are used in the galaxy.conf templates
 ### if no ssl, leave the ssl_cert_path and ssl_key_path empty
 use_ssl: true
-ssl_cert_path: /etc/pki/tls/certs/galaxy01_educloud_no.crt ################# TO DO ################
-ssl_key_path: /etc/pki/tls/private/galaxy01.educloud.no.key ################# TO DO ################
+ssl_cert_path:  /etc/pki/tls/certs/galaxy01-test_educloud_no.crt ################# TO DO ################
+ssl_key_path: /etc/pki/tls/private/galaxy01-test.educloud.no.key  ################# TO DO ################
 
 # Galaxy
 
