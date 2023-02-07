@@ -101,6 +101,8 @@ galaxy_config:
     track_jobs_in_database: true
     smtp_server: smtp.uio.no
     error_email_to: n.a.vazov@usit.uio.no
+    ## email_from is compulsory, otherwise the job error report (from bug icon) sending fails
+    email_from: Galaxy-Fox <ec-galaxy@galaxy01-test.educloud.no>
     activation_grace_period: 0
     
     # -- OiDC support-(see backend files below)------------------------------------------
