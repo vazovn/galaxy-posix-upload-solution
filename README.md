@@ -143,7 +143,7 @@ The file will be inluded by the includedir statement in sudoers file
 	post_tasks:
     - name: Change data folder ownership
       become: true
-      command: "chown -R ec-galaxy:ec-galaxy-group /cluster/galaxy-test/data"
+      command: "chown -R ec-galaxy:ec-fox-group /cluster/galaxy-test/data"
       changed_when: false
 
     - name: Change galaxy data folder mode
@@ -162,9 +162,9 @@ The file will be inluded by the includedir statement in sudoers file
 
 Do not forget to set `root` as owner of external scripts for real user setup
 
-## Add all the FOX users to group `ec01`.
+## Add all the FOX users to group `ec-fox-group`.
 
-	This allows all the members of `ec-galaxy-group` to write to the galaxy data directories
+	This allows all the members of `ec-fox-group` to write to the galaxy data directories
 
 ## Permissions
 
