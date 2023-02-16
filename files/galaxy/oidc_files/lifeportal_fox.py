@@ -43,7 +43,11 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
     def get_user_details(self, response):
         username_key = self.setting('USERNAME_KEY', default=self.USERNAME_KEY)
         #return {'username': response.get(username_key), 'email': response.get('email'), 'groups': response.get('groups')}
-        return {'username': response.get(username_key), 'email': response.get('email')}
+
+        ## This hack is needed to generate the correct username for Galaxy real user setup (emails are xxx@uio.no)
+        email = response.get('email')
+        username = "ec-"+email.split("@")[0]
+        return {'username': username, 'email': email}
 
 
     # parent method in openIid_connect.py

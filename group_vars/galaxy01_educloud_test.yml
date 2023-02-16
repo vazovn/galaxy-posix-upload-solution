@@ -20,8 +20,8 @@ postgresql_pg_hba_local_socket : true
 ### variables that are used in the galaxy.conf templates
 ### if no ssl, leave the ssl_cert_path and ssl_key_path empty
 use_ssl: true
-ssl_cert_path:  /etc/pki/tls/certs/galaxy01-test_educloud_no.crt ################# TO DO ################
-ssl_key_path: /etc/pki/tls/private/galaxy01-test.educloud.no.key  ################# TO DO ################
+ssl_cert_path:  /etc/pki/tls/certs/galaxy01-test_educloud_no.crt
+ssl_key_path: /etc/pki/tls/private/galaxy01-test.educloud.no.key
 
 # Galaxy
 
@@ -77,6 +77,10 @@ galaxy_force_checkout: true
 galaxy_oidc_backend_files_src_dir: files/galaxy/oidc_files/
 galaxy_oidc_backend_files_target_dir: "{{ galaxy_venv_dir }}/lib64/python3.6/site-packages/social_core/backends/"
 
+# Paths to real user setup files
+galaxy_scripts_dir: "{{ galaxy_server_dir }}/scripts"
+galaxy_scripts_src_dir: files/galaxy/scripts
+
 galaxy_config:
   galaxy:
 #--Admin-------------------------------------------------
@@ -126,7 +130,7 @@ galaxy_config:
     job_working_directory: "{{ galaxy_lifeportal_data_dir }}/jobs_directory"
     cluster_files_directory: "{{ galaxy_lifeportal_data_dir }}/slurm"
     
-#--Jobs Configuration----------------------------------------
+#-- Jobs Configuration ----------------------------------------
 
     # SABRY's files from Lifeportal SAGA
 
@@ -137,6 +141,13 @@ galaxy_config:
     #job_resource_params_file:  "{{ tools_root }}/tool_config/job_resource_params_conf.xml"
     
     cleanup_job: never
+
+#-- Run jobs as real user setup ----------------------------------------
+    outputs_to_working_directory: true
+    real_system_username: username
+    drmaa_external_runjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/drmaa_external_runner.py --assign_all_groups"
+    drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/drmaa_external_killer.py"
+    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/external_chown_script.py"
 
   #--  Conda setup -------------------
     #conda_prefix: "{{ galaxy_tool_dependency_dir }}/_conda"
@@ -260,6 +271,17 @@ galaxy_local_test_tools:
 #-- OIDC backend items (files) ----------------------------------------
 galaxy_oidc_backend_files:
   - lifeportal_fox.py
+
+#-- REAL USER setup files ----------------------------------------
+# in lifeportal_customized.galaxy/tasks/main.yml?
+galaxy_scripts_files:
+  - src: "{{ galaxy_scripts_src_dir}}/drmaa_external_killer.py"
+    dest: "{{ galaxy_scripts_dir }}/drmaa_external_killer.py"
+  - src: "{{ galaxy_scripts_src_dir }}/drmaa_external_runner.py"
+    dest: "{{ galaxy_scripts_dir }}/drmaa_external_runner.py"
+  - src: "{{ galaxy_scripts_src_dir }}/external_chown_script.py"
+    dest: "{{ galaxy_scripts_dir }}/external_chown_script.py"
+
 
 #-- LMOD activation scripts ----------------------------------------
 #lmod_activation_scripts:

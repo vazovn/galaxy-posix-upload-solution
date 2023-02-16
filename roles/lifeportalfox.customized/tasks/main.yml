@@ -41,6 +41,13 @@
   include_tasks: copy_lifeportal_fox_tool_dirs.yml
   when: galaxy_manage_static_setup
 
+
+## Task copying the scripts for the real user setup
+- name: Include copy chown customized scripts
+  include_tasks: copy_chown_customized_scripts.yml
+  when: galaxy_manage_static_setup
+  tags: galaxy_manage_static_setup
+
 ## OIDC  - Educloud  configuration tasks ##
 - name: Include lifeportal_fox social_backend
   include_tasks: copy_lifeportal_fox_backend.yml

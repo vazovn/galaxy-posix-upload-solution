@@ -1,56 +1,5 @@
 
-# Lifeportal on FOX
-
-# Some custom requirements
-
-## Setup of `systemd` as a **galaxy** user
-
-- all changes are in the branch *user-systemd*
-- all patches are in the directory `user-systemd-patches`
-
-
-## log4s issue and socks solution
-
-To run the ansible paybook from your local machine on *galaxy01.educloud.no* :
-
-- Download & compile the polipo package which sets the proxy protocol to http before sending it to sock5 proxy
-
-			wget https://www.irif.fr/~jch/software/files/polipo/polipo-1.1.1.tar.gz
-
-	This must be done on a machine which has an outbound connection 
-
-- Copy the compiled binary to galaxy01.educloud.no (`/usr/local/bin/`)
-
-- open a terminal as ( with One-Time Code and your password) and type:
-
-			ssh -D 12354 fox.educloud.no & polipo socksParentProxy=localhost:12354 localDocumentRoot=""  proxyPort=3128 &
-
-- leave the terminal open and use another terminal
-
-- modify the main playbook file *galaxy-educloud.yml* file - add the proxy variable under `-hosts`
-
-	  environment:
-			 https_proxy: http://localhost:8123
-			 http_proxy: http://localhost:8123
-    
- - patch the file 
-
-		/patches/virtenv_pythonpath.patch
-
-    to
-
-		/roles/galaxyproject.galaxy/tasks/virtualenv.yml
-
-    The goal of this patch is to use system-wide installed socks package. Socks is needed to fetch the galaxy code 
-    from other sources but is not available in the galaxy's venv. To avoid the catch 22 we append the system-wide pythonpath 
-    
-    **Important**: If the patch does not work, and the role fails at the task _Create Galaxy virtualenv_, copy the files:
-    
-			cp /usr/lib/python3.6/site-packages/socks* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
-			cp /usr/lib/python3.6/site-packages/transitions* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
-			cp /usr/lib/python3.6/site-packages/ipaddress* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
-			cp /usr/lib/python3.6/site-packages/construct* /cluster/galaxy/srv/galaxy/venv/lib/python3.6/site-packages
-
+# Galaxy on FOX
 
 ## PostgreSQL backup disable
 
@@ -98,6 +47,132 @@ are made in the role *lifeportal.customized* in *tasks/main.yml*. These changes 
 		aspasia.ad.fp.educloud.no:/fp/fox01  /cluster    nfs ro,bg,hard,intr,tcp,nfsvers=3
 		
 		
+# Real user setup
+(https://docs.galaxyproject.org/en/master/admin/cluster.html?highlight=drmaa_external_killer#submitting-jobs-as-the-real-user)
+
+## Copy the python scripts which _ec-galaxy_ runs as root
+
+		external_chown_script.py
+		drmaa_external_runner.py
+		drmaa_external_killer.py
+
+to
+
+		{{ galaxy_server_dir}}/scripts/
+
+## Edit the file _ec-galaxy_
+
+Manually create the file 'ec-galaxy' with the following content and put into /etc/sudoers.d/.
+The file will be inluded by the includedir statement in sudoers file
+
+	```
+	Defaults:ec-galaxy    !requiretty
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-test/srv/galaxy/server/scripts/drmaa_external_runner.py
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-test/srv/galaxy/server/scripts/drmaa_external_killer.py
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-test/srv/galaxy/server/scripts/external_chown_script.py
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /usr/bin/ls
+	```
+
+
+## Edit the file
+
+	group_vars/galaxy01_educloud_test.yml
+
+1. add block (inside `galaxy_config.galaxy`)
+
+	```
+	#-- Run jobs as real user setup ----------------------------------------
+    outputs_to_working_directory: true
+    real_system_username: username
+    drmaa_external_runjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/drmaa_external_runner.py --assign_all_groups"
+    drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/drmaa_external_killer.py"
+    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/external_chown_script.py"
+    ```
+
+2. add the paths to the files
+
+	```
+	# Paths to real user setup files
+	galaxy_scripts_dir: "{{ galaxy_server_dir }}/scripts"
+	galaxy_scripts_src_dir: files/galaxy/scripts
+	```
+
+3. define the files to be copied
+
+	```
+	#-- REAL USER setup files ----------------------------------------
+	# in lifeportal_customized.galaxy/tasks/main.yml?
+	galaxy_scripts_files:
+		- src: "{{ galaxy_scripts_src_dir}}/drmaa_external_killer.py"
+		  dest: "{{ galaxy_scripts_dir }}/drmaa_external_killer.py"
+		- src: "{{ galaxy_scripts_src_dir }}/drmaa_external_runner.py"
+		  dest: "{{ galaxy_scripts_dir }}/drmaa_external_runner.py"
+		- src: "{{ galaxy_scripts_src_dir }}/external_chown_script.py"
+		  dest: "{{ galaxy_scripts_dir }}/external_chown_script.py"
+	```
+
+## Manage the task copying the file
+
+1. Add the task to main
+
+	```
+	## Task copying the scripts for the real user setup
+	- name: Include copy chown customized scripts
+	  include_tasks: copy_chown_customized_scripts.yml
+      when: galaxy_manage_static_setup
+	  tags: galaxy_manage_static_setup
+	```
+
+2. Create (copy) the file _copy_chown_customized_scripts.yml_
+
+	This task copies the scripts defined in {{ galaxy_scripts_files }} here above
+
+	```
+	---
+
+	# Copy scripts for real user job submission which change ownership of job working dir to real user (ran by sudo)
+	- name: Install modified scripts for real user job submission
+	  copy:
+	    src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items: "{{ galaxy_scripts_files }}"
+	```
+
+## Edit the main playbook file - add post-tasks
+
+	post_tasks:
+    - name: Change data folder ownership
+      become: true
+      command: "chown -R ec-galaxy:ec-galaxy-group /cluster/galaxy-test/data"
+      changed_when: false
+
+    - name: Change galaxy data folder mode
+      become: true
+      command: "chmod -R 775 /cluster/galaxy-test/data"
+      changed_when: false
+
+    - name: Set 755 to the scripts used to elevate the permissions for real user setup
+      become: true
+      become_user: "{{ galaxy_user }}"
+      command: "{{ item }}"
+      with items:
+      - chmod 755 /cluster/galaxy-test/srv/galaxy/server/scripts/drmaa_external_runner.py
+      - chmod 755 /cluster/galaxy-test/srv/galaxy/server/scripts/drmaa_external_killer.py
+      - chmod 755 /cluster/galaxy-test/srv/galaxy/server/scripts/external_chown_script.py
+
+Do not forget to set `root` as owner of external scripts for real user setup
+
+## Add all the FOX users to group `ec01`.
+
+	This allows all the members of `ec-galaxy-group` to write to the galaxy data directories
+
+## Permissions
+
+Make the directory in the variable `outputs_to_working_directory` (in `group_vars/galaxy01_educloud_test`) `ec01`group writeable!!
+
+
+
+
 ## Monitoring and reports
 
 The program _gxadmin_ allows the admin (as _galaxy_ user) to query the framework for various parameteres. It is installed as a separate role `galaxyproject.gxadmin` which is set in the `requirements.yml`. To use it set the PGDATABASE variable in `.bashrc`for _galaxy_ user.

@@ -9,7 +9,7 @@
     - name: Install Dependencies
       package:
         name: ['acl', 'bzip2', 'git', 'make', 'python3-psycopg2', 'tar', 'virtualenv']
-    - name: Enable or reenable linger for ec-galaxy user
+    - name: Enable or reenable linger for ec-galaxy user (needed for user systemd setup)
       shell:
             "if [[ $(loginctl list-users | grep 'ec-galaxy') == *2100096* ]]; then loginctl disable-linger ec-galaxy && sleep 5 && loginctl enable-linger ec-galaxy; else loginctl enable-linger ec-galaxy; fi"
       become_user: "{{ galaxy_user }}"
@@ -33,7 +33,29 @@
     - centos.nginx
     - galaxyproject.gxadmin
 
-    
+  post_tasks:
+    - name: Change data folder ownership
+      become: true
+      command: "chown -R ec-galaxy:ec-galaxy-group /cluster/galaxy-test/data"
+      changed_when: false
+
+    - name: Change galaxy data folder mode
+      become: true
+      command: "chmod -R 775 /cluster/galaxy-test/data"
+      changed_when: false
+
+      ## Only root shall have permissions to modify these scripts
+    - name: Set 755 to the permission escalating scripts used for real user setup
+      become: true
+      become_user: "{{ galaxy_user }}"
+      command: "{{ item }} chdir=/cluster/galaxy-test/srv/galaxy/server/scripts/"
+      with_items:
+      - chmod 755 drmaa_external_runner.py
+      - chmod 755 drmaa_external_killer.py
+      - chmod 755 external_chown_script.py
+      changed_when: false
+
+
     # Enable the following variable in the terminal of the remote host (galaxy01.edicloud.no) in order to run
     # systemctl --user status galaxy and othe systemctl commands as ec-galaxy user
     # XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user.uid }}"

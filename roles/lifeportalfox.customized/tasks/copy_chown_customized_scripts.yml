@@ -1,0 +1,8 @@
+---
+
+# Copy scripts for real user job submission which change ownership of job working dir to real user (ran by sudo)
+- name: Install modified scripts for real user job submission
+  copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+  with_items: "{{ galaxy_scripts_files }}"
