@@ -143,7 +143,7 @@ The file will be inluded by the includedir statement in sudoers file
 	post_tasks:
     - name: Change data folder ownership
       become: true
-      command: "chown -R ec-galaxy:ec-fox-group /cluster/galaxy-test/data"
+      command: "chown -R ec-galaxy:ec-galaxy-group /cluster/galaxy-test/data"
       changed_when: false
 
     - name: Change galaxy data folder mode
@@ -160,15 +160,24 @@ The file will be inluded by the includedir statement in sudoers file
       - chmod 755 /cluster/galaxy-test/srv/galaxy/server/scripts/drmaa_external_killer.py
       - chmod 755 /cluster/galaxy-test/srv/galaxy/server/scripts/external_chown_script.py
 
-Do not forget to set `root` as owner of external scripts for real user setup
+## Manual setup
 
-## Add all the FOX users to group `ec-fox-group`.
+The manual setup is required as the partition `/cluster/galaxy-test/` is mounted root_squash and only writable for `ec-galaxy` user. Yet, for the modifications below `root` permissions are required.
 
-	This allows all the members of `ec-fox-group` to write to the galaxy data directories
+### Permissions on the external scripts
 
-## Permissions
+	Do not forget to set `root` as owner of external scripts (the three hereabove) for real user setup
 
-Make the directory in the variable `outputs_to_working_directory` (in `group_vars/galaxy01_educloud_test`) `ec01`group writeable!!
+### Permissions on data directories
+
+	All the Galaxy users are members of `ec01-galaxy-group`.
+	Make the directories :
+
+		/cluster/galaxy-test/data/files
+		/cluster/galaxy-test/data/jobs_directory
+		/cluster/galaxy-test/data/tmp
+
+	writeable for this group!! (775)
 
 
 

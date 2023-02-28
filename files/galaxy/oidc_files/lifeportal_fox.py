@@ -37,16 +37,19 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
     ]
 
     #DEFAULT_SCOPE = ['openid', 'email', 'groups']
-    DEFAULT_SCOPE = ['openid', 'email']
+    # scope for system user
+    #DEFAULT_SCOPE = ['openid', 'email']
+    # scope for real user
+    DEFAULT_SCOPE = ['openid', 'email', 'user']
     JWT_DECODE_OPTIONS = {'verify_at_hash': False}
 
     def get_user_details(self, response):
-        username_key = self.setting('USERNAME_KEY', default=self.USERNAME_KEY)
+
+        #username_key = self.setting('USERNAME_KEY', default=self.USERNAME_KEY)
         #return {'username': response.get(username_key), 'email': response.get('email'), 'groups': response.get('groups')}
 
-        ## This hack is needed to generate the correct username for Galaxy real user setup (emails are xxx@uio.no)
         email = response.get('email')
-        username = "ec-"+email.split("@")[0]
+        username = response.get('user')
         return {'username': username, 'email': email}
 
 
