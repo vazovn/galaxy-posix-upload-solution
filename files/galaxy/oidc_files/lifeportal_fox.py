@@ -37,16 +37,17 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
     ]
 
     #DEFAULT_SCOPE = ['openid', 'email', 'groups']
-    DEFAULT_SCOPE = ['openid', 'email']
+    DEFAULT_SCOPE = ['openid', 'profile', 'email']
     JWT_DECODE_OPTIONS = {'verify_at_hash': False}
 
+    # This methos is called by ../venv/lib/python3.6/site-packages/social_core/pipeline/social_auth.py
+    # The username format is managed by ../venv/lib/python3.6/site-packages/social_core/pipeline/user.py
     def get_user_details(self, response):
-        username_key = self.setting('USERNAME_KEY', default=self.USERNAME_KEY)
-        #return {'username': response.get(username_key), 'email': response.get('email'), 'groups': response.get('groups')}
-        return {'username': response.get(username_key), 'email': response.get('email')}
+        user = response.get('user')
+        email = response.get('user')+"@educloud.no"
+        return {'username': user, 'email': email}
 
-
-    # parent method in openIid_connect.py
+    # parent method in ../venv/.../social_core/backends/openIid_connect.py
     def find_valid_key(self, id_token):
         from jose.constants import ALGORITHMS
         for key in self.get_jwks_keys():
@@ -60,7 +61,7 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
             if rsakey.verify(message.encode('utf-8'), decoded_sig):
                 return key
 
-    # parent method in oauth.py
+    # parent method in in ../venv/.../social_core/backends/oauth.py
     def auth_headers(self):
           import base64
           client_id, client_secret = self.get_key_and_secret()
@@ -74,7 +75,7 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
           print("===== METHOD auth_headers() === lifeportal_fox.py ====")
           return headers
 
-    # parent method in oauth.py
+    # parent method in ../venv/.../social_core/backends/oauth.py
     @handle_http_errors
     def auth_complete(self, *args, **kwargs):
         """Completes login process, must return user instance"""
@@ -120,7 +121,7 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
 
 
 
-    # parent method in base.py
+    # parent method in ../venv/.../social_core/backends/base.py
     def request(self, url, method='GET', *args, **kwargs):
         kwargs.setdefault('headers', {})
         if self.setting('PROXIES') is not None:
