@@ -170,7 +170,7 @@ The manual setup is required as the partition `/cluster/galaxy-test/` is mounted
 
 ### Permissions on data directories
 
-	All the Galaxy users are members of `ec01-galaxy-group`.
+	All the Galaxy users are members of `ec-galaxy-group`.
 	Make the directories :
 
 		/cluster/galaxy-test/data/files

@@ -45,14 +45,14 @@
       changed_when: false
 
       ## Only root shall have permissions to modify these scripts
-    - name: Set 755 to the permission escalating scripts used for real user setup
+    - name: Set 400 to the permission escalating scripts used for real user setup
       become: true
       become_user: "{{ galaxy_user }}"
       command: "{{ item }} chdir=/cluster/galaxy-test/srv/galaxy/server/scripts/"
       with_items:
-      - chmod 755 drmaa_external_runner.py
-      - chmod 755 drmaa_external_killer.py
-      - chmod 755 external_chown_script.py
+      - chmod 400 drmaa_external_runner.py
+      - chmod 400 drmaa_external_killer.py
+      - chmod 400 external_chown_script.py
       changed_when: false
 
 

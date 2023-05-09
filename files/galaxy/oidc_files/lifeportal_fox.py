@@ -48,7 +48,7 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
     def get_user_details(self, response):
         user = response.get('user')
         email = response.get('user')+"@educloud.no"
-        return {'username': username, 'email': email}
+        return {'username': user, 'email': email}
 
     # parent method in ../venv/.../social_core/backends/openIid_connect.py
     def find_valid_key(self, id_token):
