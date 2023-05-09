@@ -81,7 +81,7 @@ galaxy_config:
   galaxy:
 #--Admin-------------------------------------------------
     brand: "TEST-FOX-portal"
-    admin_users: flbernal@usit.uio.no,n.a.vazov@usit.uio.no,nikolaiv@uio.no,sabryr@uio.no
+    admin_users: ec-torfin@educloud.no,ec-nikolaiv@educloud.no,ec-sabryr@educloud.no
     database_connection: "postgresql:///galaxytest?host=/var/run/postgresql"
     check_migrate_tools: false
     use_remote_user: false
