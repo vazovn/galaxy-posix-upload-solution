@@ -14,7 +14,7 @@
     repo: https://nikolaiv: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@github.uio.no/IT-ITF/sw-portals-team-lifeportal-fox-tools.git
     dest: "{{ tools_root }}" # /cluster/galaxy-test/data/tools/prod
     update: yes
-    version: master
+    version: galaxy-test
   when:  tools_root is defined
 
 
