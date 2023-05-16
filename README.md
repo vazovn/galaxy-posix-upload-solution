@@ -174,8 +174,7 @@ The file will be inluded by the includedir statement in sudoers file
       - chmod 500 drmaa_external_killer.py
       - chmod 500 external_chown_script.py
       changed_when: false
-
-	```
+  ```
 
 ## Manual setup
 
