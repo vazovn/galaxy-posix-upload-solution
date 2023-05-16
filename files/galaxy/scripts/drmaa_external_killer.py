@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Terminates a DRMAA job if given a job id and (appropriate) user id.
@@ -6,11 +6,15 @@ Terminates a DRMAA job if given a job id and (appropriate) user id.
 
 
 import sys
+
+# The packages from this line will NOT be imported in case where Galaxy itself is installed on a root_squash!!
 sys.path.append('/cluster/galaxy-test/srv/galaxy/venv/lib/python3.6/site-packages/')
+
 import errno
 import os
 import pwd
 
+# This package must be installed system-wide, not in venv in case where Galaxy itself is installed on a root_squash!!
 import drmaa
 
 

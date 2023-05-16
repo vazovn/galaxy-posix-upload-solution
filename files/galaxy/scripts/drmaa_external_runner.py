@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Submit a DRMAA job given a user id and a job template file (in JSON format)
@@ -8,12 +8,16 @@ errorPath, nativeSpecification, name, email, project
 from __future__ import print_function
 
 import sys
+
+# The packages from this line will NOT be imported in case where Galaxy itself is installed on a root_squash!!
 sys.path.append('/cluster/galaxy-test/srv/galaxy/venv/lib/python3.6/site-packages/')
+
 import errno
 import json
 import os
 import pwd
 
+# This package must be installed system-wide, not in venv in case where Galaxy itself is installed on a root_squash!!
 import drmaa
 
 DRMAA_jobTemplate_attributes = ['args', 'remoteCommand', 'outputPath', 'errorPath', 'nativeSpecification',

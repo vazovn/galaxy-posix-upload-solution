@@ -13,6 +13,12 @@
       shell:
             "if [[ $(loginctl list-users | grep 'ec-galaxy') == *2100096* ]]; then loginctl disable-linger ec-galaxy && sleep 5 && loginctl enable-linger ec-galaxy; else loginctl enable-linger ec-galaxy; fi"
       become_user: "{{ galaxy_user }}"
+    ## In case of root_squash galaxy partition drmaa has to be installed system wide, the venv installed copy will not be usable by
+    ## ec-galaxy which escalates to root
+    - name: Install drmaa for Python 3
+      ansible.builtin.pip:
+        name: drmaa
+        executable: pip3
   roles:
     - role: galaxyproject.postgresql
       __postgresql_version_dotless:  ""
@@ -34,25 +40,38 @@
     - galaxyproject.gxadmin
 
   post_tasks:
+
     - name: Change data folder ownership
       become: true
-      command: "chown -R ec-galaxy:ec-galaxy-group /cluster/galaxy-test/data"
-      changed_when: false
-
-    - name: Change galaxy data folder mode
-      become: true
-      command: "chmod -R 775 /cluster/galaxy-test/data"
-      changed_when: false
-
-      ## Only root shall have permissions to modify these scripts
-    - name: Set 400 to the permission escalating scripts used for real user setup
-      become: true
-      become_user: "{{ galaxy_user }}"
-      command: "{{ item }} chdir=/cluster/galaxy-test/srv/galaxy/server/scripts/"
+      become_user: root
+      command: "{{ item }} chdir=/cluster/galaxy-data"
       with_items:
-      - chmod 400 drmaa_external_runner.py
-      - chmod 400 drmaa_external_killer.py
-      - chmod 400 external_chown_script.py
+      - chown -R ec-galaxy:ec01-galaxy-group compiled_templates
+      - chown -R ec-galaxy:ec01-galaxy-group files
+      - chown -R ec-galaxy:ec01-galaxy-group jobs_directory
+      - chown -R ec-galaxy:ec01-galaxy-group tmp
+      - chown -R ec-galaxy:ec01-galaxy-group tools
+      - chown ec-galaxy:ec01-galaxy-group scripts
+      changed_when: false
+
+    - name: Change ownership to scripts folder
+      become: true
+      become_user: root
+      command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
+      with_items:
+      - chown root:ec01-galaxy-group drmaa_external_runner.py
+      - chown root:ec01-galaxy-group drmaa_external_killer.py
+      - chown root:ec01-galaxy-group external_chown_script.py
+      changed_when: false
+
+    - name: Set 500 to the permission escalating scripts used for real user setup
+      become: true
+      become_user: root
+      command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
+      with_items:
+      - chmod 500 drmaa_external_runner.py
+      - chmod 500 drmaa_external_killer.py
+      - chmod 500 external_chown_script.py
       changed_when: false
 
 

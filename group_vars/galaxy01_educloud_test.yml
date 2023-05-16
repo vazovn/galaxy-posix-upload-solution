@@ -49,7 +49,7 @@ galaxy_root: /cluster/galaxy-test/srv/galaxy
 galaxy_server_dir: "{{ galaxy_root }}/server"
 
 # All data dir : job dirs, files, tmp, tools, etc.
-galaxy_lifeportal_data_dir: /cluster/galaxy-test/data
+galaxy_lifeportal_data_dir: /cluster/galaxy-data
 galaxy_layout: root-dir
 
 # -- Tool related dirs --
@@ -66,8 +66,8 @@ tool_search_index_dir: "{{ galaxy_root }}/var/cache/tool_search_index"
 galaxy_user: ec-galaxy
 galaxy_user_id: 2100096
 #galaxy_group: {name: ec-galaxy-group, gid: 2100210}
-galaxy_group: ec-galaxy-group
-galaxy_group_id: 2100210
+galaxy_group: ec01-galaxy-group
+galaxy_group_id: 2102530
 galaxy_privsep_user: "{{ galaxy_user }}"
 #---------------------------------------------------------------------
 galaxy_commit_id: release_21.09
@@ -78,7 +78,7 @@ galaxy_oidc_backend_files_src_dir: files/galaxy/oidc_files/
 galaxy_oidc_backend_files_target_dir: "{{ galaxy_venv_dir }}/lib64/python3.6/site-packages/social_core/backends/"
 
 # Paths to real user setup files
-galaxy_scripts_dir: "{{ galaxy_server_dir }}/scripts"
+galaxy_scripts_dir: /cluster/galaxy-data/scripts
 galaxy_scripts_src_dir: files/galaxy/scripts
 
 galaxy_config:
@@ -145,9 +145,9 @@ galaxy_config:
 #-- Run jobs as real user setup ----------------------------------------
     outputs_to_working_directory: true
     real_system_username: username
-    drmaa_external_runjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/drmaa_external_runner.py --assign_all_groups"
-    drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/drmaa_external_killer.py"
-    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/external_chown_script.py"
+    drmaa_external_runjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/drmaa_external_runner.py --assign_all_groups"
+    drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/drmaa_external_killer.py"
+    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/external_chown_script.py"
 
   #--  Conda setup -------------------
     #conda_prefix: "{{ galaxy_tool_dependency_dir }}/_conda"
@@ -224,32 +224,6 @@ galaxy_dirs:
 #-- Galaxy Config Files-----------------------------------
 galaxy_config_files:
  
-  # SABRY's files from Lifeportal SAGA
- 
-  #- src: files/galaxy/config/lifeportal_genomes_conf.xml
-    #dest: "{{ tool_config_dir }}/lifeportal_genomes_conf.xml"
- 
-  #- src: files/galaxy/config/lifeportal_tool_conf.xml
-    #dest: "{{ tool_config_dir }}/lifeportal_tool_conf.xml"
-    
-  #- src: files/galaxy/config/lifeportal_general_tool_conf.xml
-    #dest: "{{ tool_config_dir }}/lifeportal_general_tool_conf.xml"
-
-  #- src: files/galaxy/config/lifeportal_job_conf.xml
-    #dest: "{{ galaxy_config.galaxy.job_config_file }}"
-    
-  #- src: files/galaxy/config/lifeportal_job_resource_conf.xml
-    #dest: "{{ galaxy_config.galaxy.job_resource_params_file }}"
-    
-  #- src: files/galaxy/config/tool_conf.xml
-    #dest: "{{ tool_config_dir }}/tool_conf.xml"
-    
-  #- src: files/galaxy/config/job_conf.xml
-    #dest: "{{ galaxy_config.galaxy.job_config_file }}"
-    
-  #- src: files/galaxy/config/job_resource_params_conf.xml
-    #dest: "{{ galaxy_config.galaxy.job_resource_params_file }}"
-    
   - src: files/galaxy/config/datatypes_conf.xml
     dest: "{{ galaxy_root }}/config/datatypes_conf.xml"
     

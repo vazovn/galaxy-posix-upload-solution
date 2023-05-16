@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import os
 import subprocess
 import sys
@@ -10,9 +10,10 @@ import sys
 # script is removed by the admin.
 #
 
-ALLOWED_PATHS = [ "/cluster/galaxy-test/data/jobs_directory",
-                  "/cluster/galaxy-test/data/tmp",
-                  "/cluster/galaxy-test/data//files",
+ALLOWED_PATHS = [ "/cluster/galaxy-data/jobs_directory",
+                  "/cluster/galaxy-data/tmp",
+                  "/cluster/galaxy-data/files",
+                  "/cluster/galaxy-data/scripts"
                 ]
 
 

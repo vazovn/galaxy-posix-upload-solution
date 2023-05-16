@@ -67,9 +67,9 @@ The file will be inluded by the includedir statement in sudoers file
 
 	```
 	Defaults:ec-galaxy    !requiretty
-	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-test/srv/galaxy/server/scripts/drmaa_external_runner.py
-	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-test/srv/galaxy/server/scripts/drmaa_external_killer.py
-	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-test/srv/galaxy/server/scripts/external_chown_script.py
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data/scripts/drmaa_external_runner.py
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data/scripts/drmaa_external_killer.py
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data/scripts/external_chown_script.py
 	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /usr/bin/ls
 	```
 
@@ -84,9 +84,9 @@ The file will be inluded by the includedir statement in sudoers file
 	#-- Run jobs as real user setup ----------------------------------------
     outputs_to_working_directory: true
     real_system_username: username
-    drmaa_external_runjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/drmaa_external_runner.py --assign_all_groups"
-    drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/drmaa_external_killer.py"
-    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_root }}/server/scripts/external_chown_script.py"
+    drmaa_external_runjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1   {{ galaxy_scripts_dir }}/drmaa_external_runner.py --assign_all_groups"
+    drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1   {{ galaxy_scripts_dir }}/drmaa_external_killer.py"
+    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1   {{ galaxy_scripts_dir }}/external_chown_script.py"
     ```
 
 2. add the paths to the files
@@ -139,26 +139,43 @@ The file will be inluded by the includedir statement in sudoers file
 	```
 
 ## Edit the main playbook file - add post-tasks
+  ```
+  post_tasks:
 
-	post_tasks:
     - name: Change data folder ownership
       become: true
-      command: "chown -R ec-galaxy:ec-galaxy-group /cluster/galaxy-test/data"
+      become_user: root
+      command: "{{ item }} chdir=/cluster/galaxy-data"
+      with_items:
+      - chown -R ec-galaxy:ec01-galaxy-group compiled_templates
+      - chown -R ec-galaxy:ec01-galaxy-group files
+      - chown -R ec-galaxy:ec01-galaxy-group jobs_directory
+      - chown -R ec-galaxy:ec01-galaxy-group tmp
+      - chown -R ec-galaxy:ec01-galaxy-group tools
+      - chown ec-galaxy:ec01-galaxy-group scripts
       changed_when: false
 
-    - name: Change galaxy data folder mode
+    - name: Change ownership to scripts folder
       become: true
-      command: "chmod -R 775 /cluster/galaxy-test/data"
+      become_user: root
+      command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
+      with_items:
+      - chown root:ec01-galaxy-group drmaa_external_runner.py
+      - chown root:ec01-galaxy-group drmaa_external_killer.py
+      - chown root:ec01-galaxy-group external_chown_script.py
       changed_when: false
 
-    - name: Set 755 to the scripts used to elevate the permissions for real user setup
+    - name: Set 500 to the permission escalating scripts used for real user setup
       become: true
-      become_user: "{{ galaxy_user }}"
-      command: "{{ item }}"
-      with items:
-      - chmod 755 /cluster/galaxy-test/srv/galaxy/server/scripts/drmaa_external_runner.py
-      - chmod 755 /cluster/galaxy-test/srv/galaxy/server/scripts/drmaa_external_killer.py
-      - chmod 755 /cluster/galaxy-test/srv/galaxy/server/scripts/external_chown_script.py
+      become_user: root
+      command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
+      with_items:
+      - chmod 500 drmaa_external_runner.py
+      - chmod 500 drmaa_external_killer.py
+      - chmod 500 external_chown_script.py
+      changed_when: false
+
+	```
 
 ## Manual setup
 
@@ -170,12 +187,12 @@ The manual setup is required as the partition `/cluster/galaxy-test/` is mounted
 
 ### Permissions on data directories
 
-	All the Galaxy users are members of `ec-galaxy-group`.
+	All the Galaxy users are members of `ec01-galaxy-group`.
 	Make the directories :
 
-		/cluster/galaxy-test/data/files
-		/cluster/galaxy-test/data/jobs_directory
-		/cluster/galaxy-test/data/tmp
+		/cluster/galaxy-data/files
+		/cluster/galaxy-data/jobs_directory
+		/cluster/galaxy-data/tmp
 
 	writeable for this group!! (775)
 

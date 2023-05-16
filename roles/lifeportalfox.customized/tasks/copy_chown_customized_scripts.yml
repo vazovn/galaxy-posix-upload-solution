@@ -1,8 +1,30 @@
 ---
 
-# Copy scripts for real user job submission which change ownership of job working dir to real user (ran by sudo)
+# Create slurm directory and copy scripts for real user job submission which change ownership of job working dir to real user (ran by sudo)
+
+- name: Create the directory scripts for real user support if it does not exist
+  ansible.builtin.file:
+    path: /cluster/galaxy-data/scripts
+    state: directory
+    mode: '0750'
+    group: "{{ galaxy_group_id }}"
+
 - name: Install modified scripts for real user job submission
   copy:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
   with_items: "{{ galaxy_scripts_files }}"
+
+- name: Check directories
+  stat: path=/cluster/galaxy-data/slurm
+  register: directory_slurm
+
+- debug: var=directory_slurm.stat.path
+
+- name: Create slurm directory if it doesn't already exist
+  ansible.builtin.file:
+    path: /cluster/galaxy-data/slurm
+    state: directory
+    mode: '0750'
+    group: "{{ galaxy_group_id }}"
+  when: not directory_slurm.stat.exists
