@@ -54,6 +54,20 @@
       - chown ec-galaxy:ec01-galaxy-group scripts
       changed_when: false
 
+    - name: Change data folder mode
+      become: true
+      become_user: root
+      command: "{{ item }} chdir=/cluster/galaxy-data"
+      with_items:
+      - chmod -R 750 compiled_templates
+      - chmod -R 730 files
+      - chmod -R 730 jobs_directory
+      - chmod -R 777 tmp
+      - chmod -R g+s tmp
+      - chmod -R 750 tools
+      - chmod -R 500 scripts
+      changed_when: false
+
     - name: Change ownership to scripts folder
       become: true
       become_user: root

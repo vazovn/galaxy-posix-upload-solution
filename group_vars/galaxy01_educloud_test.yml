@@ -9,7 +9,7 @@ postgresql_objects_users:
 postgresql_objects_databases:
   - name: galaxytest
     owner: ec-galaxy
-postgresql_pg_hba_local_socket : true    
+postgresql_pg_hba_local_socket : true
 
 # PostgreSQL Backups === TO RESTORE WHEN MOUNT IS READY
 #postgresql_backup_dir: /galaxy/backups
@@ -146,8 +146,8 @@ galaxy_config:
     outputs_to_working_directory: true
     real_system_username: username
     drmaa_external_runjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/drmaa_external_runner.py --assign_all_groups"
-    drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/drmaa_external_killer.py"
-    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/external_chown_script.py"
+    drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/drmaa_external_killer.py --assign_all_groups"
+    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/external_chown_script.py --assign_all_groups"
 
   #--  Conda setup -------------------
     #conda_prefix: "{{ galaxy_tool_dependency_dir }}/_conda"
