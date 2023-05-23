@@ -85,8 +85,8 @@ The file will be inluded by the includedir statement in sudoers file
     outputs_to_working_directory: true
     real_system_username: username
     drmaa_external_runjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1   {{ galaxy_scripts_dir }}/drmaa_external_runner.py --assign_all_groups"
-    drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1   {{ galaxy_scripts_dir }}/drmaa_external_killer.py"
-    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1   {{ galaxy_scripts_dir }}/external_chown_script.py"
+    drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1   {{ galaxy_scripts_dir }}/drmaa_external_killer.py -- assign_all_groups"
+    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1   {{ galaxy_scripts_dir }}/external_chown_script.py --assign_all_groups"
     ```
 
 2. add the paths to the files
