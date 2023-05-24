@@ -125,21 +125,77 @@ The file will be inluded by the includedir statement in sudoers file
 
 2. Create (copy) the file _copy_chown_customized_scripts.yml_
 
-	This task copies the scripts defined in {{ galaxy_scripts_files }} here above
+	This task copies the scripts defined in {{ galaxy_scripts_files }} here above and creates the necessary directories with the appropriate permissions and ownership
 
 	```
 	---
 
+	# Create "slurm", "compiled_templates" and "tmp" directories (when "job_working_directory" and "files" directories are created, these three are usually not by the galaxy role)
 	# Copy scripts for real user job submission which change ownership of job working dir to real user (ran by sudo)
+
+	- name: Create the directory scripts for real user support if it does not exist
+  	  ansible.builtin.file:
+    	     path: /cluster/galaxy-data/scripts
+    	     state: directory
+    	     mode: '0730'
+    	     group: "{{ galaxy_group_id }}"
+
 	- name: Install modified scripts for real user job submission
-	  copy:
-	    src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-      with_items: "{{ galaxy_scripts_files }}"
+  	  copy:
+	      src: "{{ item.src }}"
+	      dest: "{{ item.dest }}"
+	  with_items: "{{ galaxy_scripts_files }}"
+
+
+	# SLURM DIR
+	- name: Check directory slurm
+  	  stat: path=/cluster/galaxy-data/slurm
+  	  register: directory_slurm
+
+	- debug: var=directory_slurm.stat.path
+
+	- name: Create slurm directory if it doesn't already exist
+  	  ansible.builtin.file:
+    	      path: /cluster/galaxy-data/slurm
+    	      state: directory
+    	      mode: '0730'
+    	      group: "{{ galaxy_group_id }}"
+  	  when: not directory_slurm.stat.exists
+
+	# TMP DIR
+	- name: Check directory tmp
+  	  stat: path=/cluster/galaxy-data/tmp
+  	  register: directory_tmp
+
+	- debug: var=directory_tmp.stat.path
+
+	- name: Create tmp directory if it doesn't already exist
+  	  ansible.builtin.file:
+    	     path: /cluster/galaxy-data/tmp
+    	     state: directory
+    	     mode: '0730'
+    	     group: "{{ galaxy_group_id }}"
+  	  when: not directory_tmp.stat.exists
+
+	# COMPILED TEMPLATES DIR
+	- name: Check directory compiled_templates
+  	  stat: path=/cluster/galaxy-data/compiled_templates
+  	  register: directory_compiled_templates
+
+	- debug: var=directory_compiled_templates.stat.path
+
+	- name: Create compiled_templates directory if it doesn't already exist
+  	  ansible.builtin.file:
+    	    path: /cluster/galaxy-data/compiled_templates
+    	    state: directory
+    	    mode: '0730'
+    	    group: "{{ galaxy_group_id }}"
+  	  when: not directory_compiled_templates.stat.exists
+
 	```
 
 ## Edit the main playbook file - add post-tasks
-  ```
+```
   post_tasks:
 
     - name: Change data folder ownership
@@ -153,6 +209,20 @@ The file will be inluded by the includedir statement in sudoers file
       - chown -R ec-galaxy:ec01-galaxy-group tmp
       - chown -R ec-galaxy:ec01-galaxy-group tools
       - chown ec-galaxy:ec01-galaxy-group scripts
+      changed_when: false
+
+    - name: Change data folder mode
+      become: true
+      become_user: root
+      command: "{{ item }} chdir=/cluster/galaxy-data"
+      with_items:
+      - chmod -R 750 compiled_templates
+      - chmod -R 730 files
+      - chmod -R 730 jobs_directory
+      - chmod -R 777 tmp
+      - chmod -R g+s tmp
+      - chmod -R 750 tools
+      - chmod -R 500 scripts
       changed_when: false
 
     - name: Change ownership to scripts folder
@@ -174,28 +244,7 @@ The file will be inluded by the includedir statement in sudoers file
       - chmod 500 drmaa_external_killer.py
       - chmod 500 external_chown_script.py
       changed_when: false
-	```
-
-## Manual setup
-
-The manual setup is required as the partition `/cluster/galaxy-test/` is mounted root_squash and only writable for `ec-galaxy` user. Yet, for the modifications below `root` permissions are required.
-
-### Permissions on the external scripts
-
-	Do not forget to set `root` as owner of external scripts (the three hereabove) for real user setup
-
-### Permissions on data directories
-
-	All the Galaxy users are members of `ec01-galaxy-group`.
-	Make the directories :
-
-		/cluster/galaxy-data/files
-		/cluster/galaxy-data/jobs_directory
-		/cluster/galaxy-data/tmp
-
-	writeable for this group!! (775)
-
-
+```
 
 
 ## Monitoring and reports
