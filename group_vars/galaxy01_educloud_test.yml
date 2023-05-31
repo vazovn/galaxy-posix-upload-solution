@@ -123,6 +123,9 @@ galaxy_config:
     welcome_url: /static/welcome.html
     galaxy_infrastructure_url: https://galaxy01-test.educloud.no
 
+#-- File sources config
+    file_sources_config_file: "{{ galaxy_config_dir }}/file_sources_conf.yml"
+
 #-- Cluster partition based directories -----------------------------
     file_path: "{{ galaxy_lifeportal_data_dir }}/files"
     new_file_path: "{{ galaxy_lifeportal_data_dir }}/tmp"
@@ -236,6 +239,8 @@ galaxy_config_files:
   - src: files/galaxy/config/auth_conf.xml
     dest: "{{ galaxy_root }}/config/auth_conf.xml"
 
+  - src: files/galaxy/config/file_sources_conf.yml
+    dest: "{{ galaxy_root }}/config/file_sources_conf.yml"
 
 #-- Local Tools ----------------------------------------
 galaxy_local_test_tools:
