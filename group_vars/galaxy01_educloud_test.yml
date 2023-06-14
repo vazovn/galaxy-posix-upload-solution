@@ -61,14 +61,9 @@ tool_dependency_dir: "{{ tools_root }}/tool_dependencies"
 tool_cache_data_dir: "{{ galaxy_root }}/var/cache/tool_cache"
 tool_search_index_dir: "{{ galaxy_root }}/var/cache/tool_search_index"
 
-#----------------------------------------------------------------------
-#galaxy_user: {name: ec-galaxy, shell: /bin/bash, uid: 2100096}
-galaxy_user: ec-galaxy
-galaxy_user_id: 2100096
-#galaxy_group: {name: ec-galaxy-group, gid: 2100210}
-galaxy_group: ec01-galaxy-group
-galaxy_group_id: 2102530
+
 galaxy_privsep_user: "{{ galaxy_user }}"
+
 #---------------------------------------------------------------------
 galaxy_commit_id: release_21.09
 galaxy_force_checkout: true

@@ -12,7 +12,7 @@
     - name: Enable or reenable linger for ec-galaxy user (needed for user systemd setup)
       shell:
             "if [[ $(loginctl list-users | grep 'ec-galaxy') == *2100096* ]]; then loginctl disable-linger ec-galaxy && sleep 5 && loginctl enable-linger ec-galaxy; else loginctl enable-linger ec-galaxy; fi"
-      become_user: "{{ galaxy_user }}"
+      become_user: "{{ galaxy_user_name }}"
     ## In case of root_squash galaxy partition drmaa has to be installed system wide, the venv installed copy will not be usable by
     ## ec-galaxy which escalates to root
     - name: Install drmaa for Python 3
@@ -25,73 +25,74 @@
     - role: galaxyproject.postgresql_objects
       become: true
       become_user: postgres
-    - geerlingguy.pip
-    - role: galaxyproject.galaxy
-      become: true
-      become_user: "{{ galaxy_user }}"
-      # customized tasks
-    - role: lifeportalfox.customized
-      become: true
-      become_user: "{{ galaxy_user }}"
-    - role: slurmdrmaa.galaxy
-      become: yes
-      become_user: root
-    - centos.nginx
-    - galaxyproject.gxadmin
 
-  post_tasks:
-
-    - name: Change data folder ownership
-      become: true
-      become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data"
-      with_items:
-      - chown -R ec-galaxy:ec01-galaxy-group compiled_templates
-      - chown -R ec-galaxy:ec01-galaxy-group files
-      - chown -R ec-galaxy:ec01-galaxy-group jobs_directory
-      - chown -R ec-galaxy:ec01-galaxy-group tmp
-      - chown -R ec-galaxy:ec01-galaxy-group tools
-      - chown ec-galaxy:ec01-galaxy-group scripts
-      changed_when: false
-
-    - name: Change data folder mode
-      become: true
-      become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data"
-      with_items:
-      - chmod -R 750 compiled_templates
-      - chmod -R 730 files
-      - chmod -R 730 jobs_directory
-      - chmod -R 777 tmp
-      - chmod -R g+s tmp
-      - chmod -R 750 tools
-      - chmod -R 500 scripts
-      changed_when: false
-
-    - name: Change ownership to scripts folder
-      become: true
-      become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
-      with_items:
-      - chown root:ec01-galaxy-group drmaa_external_runner.py
-      - chown root:ec01-galaxy-group drmaa_external_killer.py
-      - chown root:ec01-galaxy-group external_chown_script.py
-      changed_when: false
-
-    - name: Set 500 to the permission escalating scripts used for real user setup
-      become: true
-      become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
-      with_items:
-      - chmod 500 drmaa_external_runner.py
-      - chmod 500 drmaa_external_killer.py
-      - chmod 500 external_chown_script.py
-      changed_when: false
-
-
-    # Enable the following variable in the terminal of the remote host (galaxy01.edicloud.no) in order to run
-    # systemctl --user status galaxy and othe systemctl commands as ec-galaxy user
-    # XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user.uid }}"
-    # export XDG_RUNTIME_DIR=/run/user/2100096
-    ## Then as ec-galaxy user run
-    ## systemctl --user status galaxy
+  #
+  #   - role: galaxyproject.galaxy
+  #     become: true
+  #     become_user: "{{ galaxy_user_name }}"
+  #     # customized tasks
+  #   - role: lifeportalfox.customized
+  #     become: true
+  #     become_user: "{{ galaxy_user_name }}"
+  #   - role: slurmdrmaa.galaxy
+  #     become: yes
+  #     become_user: root
+  #   - centos.nginx
+  #   - galaxyproject.gxadmin
+  #
+  # post_tasks:
+  #
+  #   - name: Change data folder ownership
+  #     become: true
+  #     become_user: root
+  #     command: "{{ item }} chdir=/cluster/galaxy-data"
+  #     with_items:
+  #     - chown -R ec-galaxy:ec01-galaxy-group compiled_templates
+  #     - chown -R ec-galaxy:ec01-galaxy-group files
+  #     - chown -R ec-galaxy:ec01-galaxy-group jobs_directory
+  #     - chown -R ec-galaxy:ec01-galaxy-group tmp
+  #     - chown -R ec-galaxy:ec01-galaxy-group tools
+  #     - chown ec-galaxy:ec01-galaxy-group scripts
+  #     changed_when: false
+  #
+  #   - name: Change data folder mode
+  #     become: true
+  #     become_user: root
+  #     command: "{{ item }} chdir=/cluster/galaxy-data"
+  #     with_items:
+  #     - chmod -R 750 compiled_templates
+  #     - chmod -R 730 files
+  #     - chmod -R 730 jobs_directory
+  #     - chmod -R 777 tmp
+  #     - chmod -R g+s tmp
+  #     - chmod -R 750 tools
+  #     - chmod -R 500 scripts
+  #     changed_when: false
+  #
+  #   - name: Change ownership to scripts folder
+  #     become: true
+  #     become_user: root
+  #     command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
+  #     with_items:
+  #     - chown root:ec01-galaxy-group drmaa_external_runner.py
+  #     - chown root:ec01-galaxy-group drmaa_external_killer.py
+  #     - chown root:ec01-galaxy-group external_chown_script.py
+  #     changed_when: false
+  #
+  #   - name: Set 500 to the permission escalating scripts used for real user setup
+  #     become: true
+  #     become_user: root
+  #     command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
+  #     with_items:
+  #     - chmod 500 drmaa_external_runner.py
+  #     - chmod 500 drmaa_external_killer.py
+  #     - chmod 500 external_chown_script.py
+  #     changed_when: false
+  #
+  #
+  #   # Enable the following variable in the terminal of the remote host (galaxy01.edicloud.no) in order to run
+  #   # systemctl --user status galaxy and othe systemctl commands as ec-galaxy user
+  #   # XDG_RUNTIME_DIR: "/run/user/{{ galaxy_user_name.uid }}"
+  #   # export XDG_RUNTIME_DIR=/run/user/2100096
+  #   ## Then as ec-galaxy user run
+  #   ## systemctl --user status galaxy
