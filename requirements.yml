@@ -1,29 +1,12 @@
-# - src: galaxyproject.galaxy
-#   version: 0.9.17
-# - src: galaxyproject.gxadmin
-#   version: 0.0.8
-# - src: galaxyproject.postgresql
-#   version: 1.0.3
-# - src: natefoo.postgresql_objects
-#   version: 1.1
-# - src: geerlingguy.pip
-#   version: 2.0.0
-#- src: uchida.miniconda
-#  version: 0.3.0
-#- src: usegalaxy_eu.galaxy_systemd
-#  version: 0.1.4
-
+# Galaxy, Postgres, Nginx
 - src: galaxyproject.galaxy
-  version: 0.10.4
-#- src: galaxyproject.nginx
-#  version: 0.7.0
+  version: 0.10.14
+- src: galaxyproject.nginx
+  version: 0.7.1
 - src: galaxyproject.postgresql
-  version: 1.0.3
+  version: 1.1.2
 - src: galaxyproject.postgresql_objects
-  version: 1.1.0
-- src: geerlingguy.pip
-  version: 2.0.0
-- src: uchida.miniconda
-  version: 0.3.0
-#- src: usegalaxy_eu.certbot
-#  version: 0.1.5
+  version: 1.2.0
+- src: galaxyproject.miniconda
+  version: 0.3.1
+
