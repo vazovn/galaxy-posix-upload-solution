@@ -1,5 +1,4 @@
-- type: posix
-  root: '/tmp/file_source_test/'
-  id: fox-projects
+- type: gxuserhome
+  id: userhome
   doc: Get your data from FOX project
   label: FOX Project Area

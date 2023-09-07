@@ -88,7 +88,6 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
 
         print("========= METHOD === auth_complete ()  in lifeportal_fox.py ======")
 
-
         if self.ACCESS_TOKEN_METHOD == 'GET':
                params = self.auth_complete_params(state)
         else:
@@ -117,12 +116,9 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
                    method=self.ACCESS_TOKEN_METHOD
                )
 
-
         self.process_error(response)
         return self.do_auth(response['access_token'], response=response,
                             *args, **kwargs)
-
-
 
     # parent method in base.py
     def request(self, url, method='GET', *args, **kwargs):

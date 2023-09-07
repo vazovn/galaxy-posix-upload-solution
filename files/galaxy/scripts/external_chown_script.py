@@ -16,8 +16,6 @@ ALLOWED_PATHS = [ "/cluster/galaxy-data/jobs_directory",
                   "/cluster/galaxy-data/scripts"
                 ]
 
-
-#ALLOWED_PATHS = [ "job_working_directory", "new_file_path" ]
 #ALLOWED_PATHS = None
 
 
@@ -36,11 +34,13 @@ def validate_parameters():
                 allowed = True
                 break
     if not allowed:
-        sys.stderr.write("owner and group modifications in %s are not allowed\n" % path)
-        sys.exit(1)
+         sys.stderr.write("owner and group modifications in %s are not allowed\n" % path)
+         sys.exit(1)
 
     galaxy_user_name = sys.argv[2]
-    gid = sys.argv[3]
+    #gid = sys.argv[3]
+    # Force common ec01-galaxy-group (2102530)
+    gid = '2102530'
     return path, galaxy_user_name, gid
 
 

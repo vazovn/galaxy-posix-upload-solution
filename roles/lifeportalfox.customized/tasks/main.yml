@@ -3,6 +3,10 @@
 - name: Copy welcome page
   include_tasks: copy_welcome_page.yml
   when: galaxy_manage_static_setup
+
+- name: Copy access_user_home page
+  include_tasks: copy_galaxy_hpc_user_home.yml
+  when: galaxy_manage_static_setup
   
 - name: Change favicon png file put fox icon
   include_tasks: copy_favicon_png.yml
@@ -15,9 +19,9 @@
   #when: galaxy_manage_static_setup
 
 ## Tasks related to the modification of the front page (login page with Educloud) ## 
-- name: Modify Login vue file
-  include_tasks: copy_login_vue.yml
-  when: galaxy_manage_static_setup
+#- name: Modify Login vue file
+#  include_tasks: copy_login_vue.yml
+#  when: galaxy_manage_static_setup
 
 ## The following task is necessary only when the host has no connection to the outside world!!
 ## Activate 'galaxy_use_tunnel' in the group_vars/galaxy01_educloud_test.yml
@@ -33,14 +37,18 @@
    - 'HTTP_PROXY=http://localhost:3128'
   when: galaxy_use_tunnel
 
-- name: Run make client again after Modify Login vue file and Modify Makefile
-  shell: "source  /cluster/galaxy-test/srv/galaxy/venv/bin/activate && cd /cluster/galaxy-test/srv/galaxy/server && /usr/bin/make client"
+#- name: Run make client again after Modify Login vue file and Modify Makefile
+#  shell: "source  /cluster/galaxy-test/srv/galaxy/venv/bin/activate && cd /cluster/galaxy-test/srv/galaxy/server && /usr/bin/make client"
 
 ## === This task will be used to install tools  === ##
 - name: Make the lifeportal fox tool directories
   include_tasks: copy_lifeportal_fox_tool_dirs.yml
   when: galaxy_manage_static_setup
 
+## Change the group of the directory containing galaxy services ##
+- name: Include chgrp for the directory containing user services
+  include_tasks: chgrp_directory_user_systemd_services.yml
+  when: not galaxy_systemd_root
 
 ## Task copying the scripts for the real user setup
 - name: Include copy chown customized scripts

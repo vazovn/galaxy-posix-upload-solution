@@ -1,27 +1,7 @@
 ---
-# Python 3 support
-pip_virtualenv_command: /usr/bin/python3 -m virtualenv # 
-pip_package: python3-pip                               # geerlingguy.pip
 
-# PostgreSQL
-postgresql_objects_users:
-  - name: ec-galaxy
-postgresql_objects_databases:
-  - name: galaxytest
-    owner: ec-galaxy
-postgresql_pg_hba_local_socket : true
-
-# PostgreSQL Backups === TO RESTORE WHEN MOUNT IS READY
-#postgresql_backup_dir: /galaxy/backups
-#postgresql_backup_local_dir: "~postgres/backups"
-#postgresql_backup_mail_recipient: "n.a.vazov@usit.uio.no"
-
-# Nginx
-### variables that are used in the galaxy.conf templates
-### if no ssl, leave the ssl_cert_path and ssl_key_path empty
-use_ssl: true
-ssl_cert_path:  /etc/pki/tls/certs/galaxy01-test_educloud_no.crt
-ssl_key_path: /etc/pki/tls/private/galaxy01-test.educloud.no.key
+# Python3 support
+pip_virtualenv_command: /usr/bin/python3 -m virtualenv --copies
 
 # Galaxy
 
@@ -29,11 +9,33 @@ ssl_key_path: /etc/pki/tls/private/galaxy01-test.educloud.no.key
 galaxy_create_user: false
 galaxy_separate_privileges: true
 galaxy_manage_paths: true
+galaxy_layout: root-dir
+galaxy_root: /cluster/galaxy-test/srv/galaxy
+
+galaxy_user: {name: "{{ galaxy_user_name }}", shell: /bin/bash, uid: 2100096}
+galaxy_privsep_user: "{{ galaxy_user_name }}"
+
+galaxy_commit_id: release_23.1
+galaxy_force_checkout: true
+
+########################################################
+
+# Nginx
+### variables that are used in the galaxy.conf templates
+### if no ssl, leave the ssl_cert_path and ssl_key_path empty
+use_ssl: true
+# ssl_cert_path:  /etc/pki/tls/certs/galaxy01-test_educloud_no.crt
+# ssl_key_path: /etc/pki/tls/private/galaxy01-test.educloud.no.key
+
+# Galaxy
+
+# only for RHEL8 otherwise "true"
+
 galaxy_manage_mutable_setup: true
 galaxy_manage_database: true
 galaxy_fetch_dependencies: true
-galaxy_manage_systemd: yes
 
+galaxy_manage_systemd: yes
 # If installing on a root_squash, you need to enable the galaxy user to set up the galaxy.service
 # and set galaxy_systemd_root to false, ..tasks/systemd_galaxy.yml is defining this
 galaxy_systemd_root: false
@@ -45,14 +47,15 @@ galaxy_manage_systemd_reports: no
 galaxy_use_tunnel: false
 
 # Server dir
-galaxy_root: /cluster/galaxy-test/srv/galaxy
 galaxy_server_dir: "{{ galaxy_root }}/server"
+
+# Gunicorn socket directory
+gunicorn_dir: /gunicorn
 
 # All data dir : job dirs, files, tmp, tools, etc.
 galaxy_lifeportal_data_dir: /cluster/galaxy-data
-galaxy_layout: root-dir
 
-# -- Tool related dirs --
+# -- General tool related dirs --
 tools_root: "{{ galaxy_lifeportal_data_dir }}/tools/prod"
 tool_config_dir: "{{ tools_root }}/tool_config"
 tool_data_path: "{{ tools_root }}/tool_locs"
@@ -60,17 +63,12 @@ tool_dependency_cache_dir: "{{ tools_root }}//tool_dependencies/_cache"
 tool_dependency_dir: "{{ tools_root }}/tool_dependencies"
 tool_cache_data_dir: "{{ galaxy_root }}/var/cache/tool_cache"
 tool_search_index_dir: "{{ galaxy_root }}/var/cache/tool_search_index"
-
-
-galaxy_privsep_user: "{{ galaxy_user }}"
-
-#---------------------------------------------------------------------
-galaxy_commit_id: release_21.09
-galaxy_force_checkout: true
+ucsc_build_sites: "{{ galaxy_root }}/server/tool-data/shared/ucsc/ucsc_build_sites.txt.sample"
+visualization_plugins_directory: "{{ galaxy_root }}/server/config/plugins/visualizations"
 
 # Source and target file directories for oidc backends
 galaxy_oidc_backend_files_src_dir: files/galaxy/oidc_files/
-galaxy_oidc_backend_files_target_dir: "{{ galaxy_venv_dir }}/lib64/python3.6/site-packages/social_core/backends/"
+galaxy_oidc_backend_files_target_dir: "{{ galaxy_venv_dir }}/lib/python3.11/site-packages/social_core/backends/"
 
 # Paths to real user setup files
 galaxy_scripts_dir: /cluster/galaxy-data/scripts
@@ -81,7 +79,6 @@ galaxy_config:
 #--Admin-------------------------------------------------
     brand: "TEST-FOX-portal"
     admin_users: ec-nikolaiv@educloud.no,ec-torfin@educloud.no,ec-sabryr@educloud.no
-    database_connection: "postgresql:///galaxytest?host=/var/run/postgresql"
     check_migrate_tools: false
     use_remote_user: false
     allow_user_impersonation: true
@@ -94,10 +91,14 @@ galaxy_config:
     enable_quotas: true
     allow_user_creation: false
     show_welcome_with_login: true
+
+## -- DB -------------------------------------------------
+    database_connection: "postgresql:///galaxytest?host=/var/run/postgresql"
+
+
     
 # -- Authentication -------------------------------------------
     user_activation_on: false
-    track_jobs_in_database: false
     smtp_server: smtp.uio.no
     error_email_to: n.a.vazov@usit.uio.no
     ## email_from is compulsory, otherwise the job error report (from bug icon) sending fails
@@ -127,13 +128,17 @@ galaxy_config:
     template_cache_path: "{{ galaxy_lifeportal_data_dir }}/compiled_templates"
     job_working_directory: "{{ galaxy_lifeportal_data_dir }}/jobs_directory"
     cluster_files_directory: "{{ galaxy_lifeportal_data_dir }}/slurm"
+
+    ## New feature
+    object_store_store_by: uuid
     
 #--  Jobs Configuration ----------------------------------------
 
     # SABRY's files from Lifeportal SAGA
 
-    job_config_file: "{{ tools_root }}/tool_config/lifeportal_job_conf.xml"
+    job_config_file: "{{ tools_root }}/tool_config/lifeportal_job_conf.yml"
     job_resource_params_file:  "{{ tools_root }}/tool_config/lifeportal_job_resource_conf.xml"
+    job_metrics_config_file: "{{ galaxy_root }}/server/config/job_metrics_conf.xml.sample"
     
     #job_config_file: "{{ tools_root }}/tool_config/job_conf.xml"
     #job_resource_params_file:  "{{ tools_root }}/tool_config/job_resource_params_conf.xml"
@@ -143,19 +148,13 @@ galaxy_config:
 #-- Run jobs as real user setup ----------------------------------------
     outputs_to_working_directory: true
     real_system_username: username
+    ## Check that the two following lines are not spread on two consecutive lines""
     drmaa_external_runjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/drmaa_external_runner.py --assign_all_groups"
     drmaa_external_killjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/drmaa_external_killer.py --assign_all_groups"
-    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/external_chown_script.py --assign_all_groups"
+    ## DO NOT ADD "--assign_all_groups" to external_chown_script!!!
+    external_chown_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/external_chown_script.py"
 
-  #--  Conda setup -------------------
-    #conda_prefix: "{{ galaxy_tool_dependency_dir }}/_conda"
-    #conda_exec: "{{ galaxy_tool_dependency_dir }}/_conda/bin/conda"
-    #conda_debug: "false"
-    #conda_ensure_channels: "iuc,conda-forge,bioconda,defaults,imperial-college-research-computing"
-    #conda_auto_install: "false"
-    #conda_auto_init: "true"
-    #conda_copy_dependencies: true
-    
+
 #-- Tool Configuration----------------------------------------
 
     # SABRY's files from Lifeportal SAGA
@@ -163,8 +162,9 @@ galaxy_config:
     tool_data_table_config_path: "{{ tool_config_dir }}/lifeportal_genomes_conf.xml"
     tool_config_file: "{{ tool_config_dir }}/lifeportal_tool_conf.xml,{{ tool_config_dir }}/lifeportal_general_tool_conf.xml"
     integrated_tool_panel_config: "{{ tool_config_dir }}/integrated_tool_panel.xml"
-    datatypes_config_file: "{{ galaxy_root }}/config/datatypes_conf.xml"
-    
+    datatypes_config_file: "{{ galaxy_root }}/server/config/datatypes_conf.xml.sample"
+
+
     # This block is new - after 21.09. It means that the packages (the PATHs) 
     # will be resolved as being located in the 'tool_dependency_dir' and binaries' PATH will 
     # be derived from the <requirement> block in the respective tool wrapper file. Version is mandatory
@@ -173,33 +173,50 @@ galaxy_config:
     - type: galaxy_packages
       versionless: false
       base_path: "{{ tool_dependency_dir }}"
-  
-  uwsgi:
-    socket: 127.0.0.1:8080
-    #http: 0.0.0.0:8080
-    buffer-size: 16384
-    processes: 1
-    threads: 4
-    offload-threads: 2
-    static-map:
-      - /static={{ galaxy_server_dir }}/static
-      - /favicon.ico={{ galaxy_server_dir }}/static/favicon.ico
-    static-safe: client/galaxy/images
-    master: true
+
+
+  gravity:
+    service_command_style: gravity
+    use_service_instances: true
+    log_dir: "{{ galaxy_lifeportal_data_dir }}/gravity/log"
+    app_server: gunicorn
+
+    process_manager: systemd
+    galaxy_root: "{{ galaxy_root }}/server"
+    galaxy_user: "{{ galaxy_user_name }}"
     virtualenv: "{{ galaxy_venv_dir }}"
-    pythonpath: "{{ galaxy_server_dir }}/lib"
-    module: galaxy.webapps.galaxy.buildapp:uwsgi_app()
-    thunder-lock: true
-    die-on-term: true
-    hook-master-start:
-      - unix_signal:2 gracefully_kill_them_all
-      - unix_signal:15 gracefully_kill_them_all
-    py-call-osafterfork: true
-    enable-threads: true
-    mule:
-      - lib/galaxy/main.py
-      - lib/galaxy/main.py
-    farm: job-handlers:1,2
+    umask: '047'
+    gunicorn:
+
+      enable: true
+
+      # listening options
+      bind: "unix:{{ gunicorn_dir }}/gunicorn.sock"
+      # performance options
+      workers: 2
+      # Other options that will be passed to gunicorn
+      # This permits setting of 'secure' headers like REMOTE_USER (and friends)
+      # https://docs.gunicorn.org/en/stable/settings.html#forwarded-allow-ips
+      extra_args: '--forwarded-allow-ips="*"'
+      # This lets Gunicorn start Galaxy completely before forking which is faster.
+      # https://docs.gunicorn.org/en/stable/settings.html#preload-app
+      preload: true
+    celery:
+
+      enable: true
+      enable_beat: true
+      queues: celery,galaxy.internal,galaxy.external
+
+      concurrency: 2
+      loglevel: DEBUG
+
+    handlers:
+      handler:
+          processes: 2
+          pools:
+          - job-handlers
+          - workflow-schedulers
+
 
 #-- Galaxy dirs ---------------------
 galaxy_dirs:
@@ -217,20 +234,20 @@ galaxy_dirs:
   - "{{ tool_dependency_dir }}"
   - "{{ tool_cache_data_dir }}"
   - "{{ tool_search_index_dir }}"
-  
 
-#-- Galaxy Config Files-----------------------------------
+#
+# #-- Galaxy Config Files-----------------------------------
 galaxy_config_files:
- 
+
   - src: files/galaxy/config/datatypes_conf.xml
     dest: "{{ galaxy_root }}/config/datatypes_conf.xml"
-    
+
   - src: files/galaxy/config/oidc_backends_config.xml
     dest: "{{ galaxy_root }}/config/oidc_backends_config.xml"
-    
+
   - src: files/galaxy/config/oidc_config.xml
     dest: "{{ galaxy_root }}/config/oidc_config.xml"
-    
+
   - src: files/galaxy/config/auth_conf.xml
     dest: "{{ galaxy_root }}/config/auth_conf.xml"
 
@@ -241,7 +258,7 @@ galaxy_config_files:
 galaxy_local_test_tools:
   - testing_static_slurm.xml
 
-  
+
 #-- OIDC backend items (files) ----------------------------------------
 galaxy_oidc_backend_files:
   - lifeportal_fox.py
@@ -258,29 +275,53 @@ galaxy_scripts_files:
 
 
 #-- LMOD activation scripts ----------------------------------------
-#lmod_activation_scripts:
-# - z00_lmod.sh
-#  - z01_StdEnv.sh
-
-#-- Local  Interactive Tools -------------------------------
-
-## copied by the task "copy_local_*_tools.yml" in role: galaxyhepp.customized
-
-#galaxy_local_interactive_tools:
-  #- interactivetool_jupyter_notebook_fys5555.xml
-  #- interactivetool_comphep.xml
-  #- default_notebook.ipynb
-
-
-#-- Dynamic Job Rules Files------------------------------
+lmod_activation_scripts:
+ - z00_lmod.sh
+ - z01_StdEnv.sh
+#
+# #-- Dynamic Job Rules Files------------------------------
 galaxy_dynamic_job_rules:
   - generate_slurm_job_params.py
   - destinations.py
+#
+# # systemd
+# #galaxy_systemd_mode: mule - defined in defaults/main.yml
+#__galaxy_systemd_memory_limit_merged:
+#     mule: 32
+#galaxy_systemd_env: [DRMAA_LIBRARY_PATH="/drmaa/lib/libdrmaa.so.1"]
+# #galaxy_restart_handler_name: - defined in defaults/main.yml
+#
 
-# systemd
-#galaxy_systemd_mode: mule - defined in defaults/main.yml
-__galaxy_systemd_memory_limit_merged: 
-    mule: 32
-galaxy_systemd_env: [DRMAA_LIBRARY_PATH="/drmaa/lib/libdrmaa.so.1"]
-#galaxy_restart_handler_name: - defined in defaults/main.yml
-
+#--  NGINX --------------
+nginx_selinux_allow_local_connections: true
+nginx_servers:
+    - redirect-ssl
+nginx_ssl_servers:
+    - galaxy
+nginx_enable_default_server: false
+nginx_conf_http:
+    client_max_body_size: 1g
+    # gzip: "on" # This is enabled by default in Ubuntu, and the duplicate directive will cause a crash.
+    gzip_proxied: "any"
+    gzip_static: "on"   # The ngx_http_gzip_static_module module allows sending precompressed files with the ".gz" filename extension instead of regular files.
+    gzip_vary: "on"
+    gzip_min_length: 128
+    gzip_comp_level: 6  # Tradeoff of better compression for slightly more CPU time.
+    gzip_types: |
+      text/plain
+      text/css
+      text/xml
+      text/javascript
+      application/javascript
+      application/x-javascript
+      application/json
+      application/xml
+      application/xml+rss
+      application/xhtml+xml
+      application/x-font-ttf
+      application/x-font-opentype
+      image/png
+      image/svg+xml
+      image/x-icon
+nginx_conf_ssl_certificate: /etc/pki/tls/certs/galaxy01-test_educloud_no.crt
+nginx_conf_ssl_certificate_key: /etc/pki/tls/private/galaxy01-test.educloud.no.key

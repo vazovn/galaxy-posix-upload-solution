@@ -1,0 +1,9 @@
+---
+
+## Change the group of the directory containing galaxy services : galaxy-celery-beat.service, galaxy-gunicorn.service etc
+## from ec-galaxy-group (private group of ec-galaxy user) to ec01-galaxy-group (the group of the galaxy plaform)
+## Otherwise the error : Failed to connect to bus: No such file or directory.
+
+- name: Change group from ec-galaxy-group to ec01-galaxy-group
+  command: chgrp -R ec01-galaxy-group ./user chdir=/home/ec-galaxy/.config/systemd/
+  changed_when: false

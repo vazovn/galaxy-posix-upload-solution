@@ -5,3 +5,9 @@ postgresql_objects_users:
 postgresql_objects_databases:
   - name: "{{ galaxy_db_name }}"
     owner: "{{ galaxy_user_name }}"
+
+
+# PostgreSQL Backups === TO RESTORE WHEN MOUNT IS READY
+#postgresql_backup_dir: /galaxy/backups
+#postgresql_backup_local_dir: "~postgres/backups"
+#postgresql_backup_mail_recipient: "n.a.vazov@usit.uio.no"

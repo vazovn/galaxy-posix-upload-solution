@@ -8,7 +8,7 @@ Terminates a DRMAA job if given a job id and (appropriate) user id.
 import sys
 
 # The packages from this line will NOT be imported in case where Galaxy itself is installed on a root_squash!!
-sys.path.append('/cluster/galaxy-test/srv/galaxy/venv/lib/python3.6/site-packages/')
+sys.path.append('/cluster/galaxy-test/srv/galaxy/venv/lib/python3.11/site-packages/')
 
 import errno
 import os
@@ -17,15 +17,27 @@ import pwd
 # This package must be installed system-wide, not in venv in case where Galaxy itself is installed on a root_squash!!
 import drmaa
 
+# Without --assign-all-groups
+#
+# def validate_paramters():
+#     if len(sys.argv) < 3:
+#         sys.stderr.write("usage: %s [job ID] [user uid]\n" % sys.argv[0])
+#         exit(1)
+#
+#     jobID = sys.argv[1]
+#     uid = int(sys.argv[2])
+#     return jobID, uid
 
+# With --assign-all-groups
 def validate_paramters():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         sys.stderr.write("usage: %s [job ID] [user uid]\n" % sys.argv[0])
         exit(1)
 
-    jobID = sys.argv[1]
-    uid = int(sys.argv[2])
+    jobID = sys.argv[2]
+    uid = int(sys.argv[3])
     return jobID, uid
+
 
 
 def set_user(uid):

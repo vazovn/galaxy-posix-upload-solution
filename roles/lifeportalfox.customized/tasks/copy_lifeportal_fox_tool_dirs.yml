@@ -15,6 +15,7 @@
     dest: "{{ tools_root }}" # /cluster/galaxy-data/tools/prod
     update: yes
     version: galaxy-test
+    force: yes
   when:  tools_root is defined
 
 

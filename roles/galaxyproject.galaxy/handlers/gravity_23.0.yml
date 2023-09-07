@@ -12,3 +12,5 @@
   listen: "restart galaxy"
   become: yes
   become_user: "{{ (__galaxy_gravity_pm == 'systemd' and galaxy_systemd_root) | ternary('root', __galaxy_user_name) }}"
+  environment:
+    XDG_RUNTIME_DIR: '/run/user/2100096'

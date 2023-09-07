@@ -26,24 +26,43 @@
   ansible.builtin.debug:
     msg: "The file does not exists"
   when: not st.stat.exists
-  
+
 - name: Create galaxy conf from template https
   template:
-    src: templates/galaxy_ssl.conf.j2
+    src: templates/galaxy.j2
     dest: /etc/nginx/conf.d/galaxy.conf
     backup: yes
   when:  not st.stat.exists and use_ssl
   notify:
-    - reload nginx         
-  
-- name: Create galaxy conf from template http
+    - reload nginx
+
+- name: Create redirect conf from template https
   template:
-    src: templates/galaxy.conf.j2
-    dest: /etc/nginx/conf.d/galaxy.conf
+    src: templates/redirect-ssl.j2
+    dest: /etc/nginx/conf.d/redirect_ssl.conf
     backup: yes
-  when:  not st.stat.exists and not use_ssl
+  when:  use_ssl
   notify:
-    - reload nginx         
+    - reload nginx
+
+#
+# - name: Create galaxy conf from template https
+#   template:
+#     src: templates/galaxy_ssl.conf.j2
+#     dest: /etc/nginx/conf.d/galaxy.conf
+#     backup: yes
+#   when:  not st.stat.exists and use_ssl
+#   notify:
+#     - reload nginx
+#
+# - name: Create galaxy conf from template http
+#   template:
+#     src: templates/galaxy.conf.j2
+#     dest: /etc/nginx/conf.d/galaxy.conf
+#     backup: yes
+#   when:  not st.stat.exists and not use_ssl
+#   notify:
+#     - reload nginx
 
 - name: Setting up Nginx to forward traffic
   command: setsebool -P httpd_can_network_connect 1

@@ -22,9 +22,13 @@
 
   when: certbot_well_known_root is defined
 
+# - name: "Allow connecting to localhost"
+#   seboolean:
+#     name: httpd_can_network_connect
+#     state: yes
+#     persistent: yes
+#   when: nginx_selinux_allow_local_connections
+
 - name: "Allow connecting to localhost"
-  seboolean:
-    name: httpd_can_network_connect
-    state: yes
-    persistent: yes
+  command: setsebool -P httpd_can_network_connect 1
   when: nginx_selinux_allow_local_connections
