@@ -1,4 +1,36 @@
+
+#  =====================  The permissions for HOME Area =======================
+
+#  0 drwxr-xr-x. 4 root      root                  42 Sep  8 14:10 file_source_test
+#  inside
+#  0 dr-xr-x---. 2 ec-galaxy ec-nikolaiv-group 30 Aug 22 14:36 ec-nikolaiv
+
+#  POSIX ACCESS
+#  Regardless of the logged user, the access to the directories and the upload is a process owned by ec-galaxy
+
+#  DISPLAY IN GALAXY GUI
+#  The display of the logged user home directory is carried out by ec-galaxy user but is filtered by the value username
+#  ../lib/galaxy/files/sources/galaxy.py  where the path shall contain the username of the logged user
+#  root="/tmp/file_source_test/${user.username}/"
+
+
 - type: gxuserhome
   id: userhome
-  doc: Get your data from FOX project
-  label: FOX Project Area
+  doc: Get your data from FOX home area
+  label: FOX Home Area
+
+
+#  ===================== The permissions for PROJECT Area =======================
+
+# 0 drwxr-xr-x. 6 root      root                  54 Sep 12 15:18 file_source_test_projects
+# inside
+# 0 drwxr-x---. 2 root ec01-member-group          27 Sep 12 15:21 ec01
+
+# The access to the project directory is limited to the group, root remains to be the owner
+
+
+- type: gxuserprojects
+  id: userprojects
+  doc: Get your data from FOX project area
+  label: FOX project Area
+

@@ -4,8 +4,8 @@
   include_tasks: copy_welcome_page.yml
   when: galaxy_manage_static_setup
 
-- name: Copy access_user_home page
-  include_tasks: copy_galaxy_hpc_user_home.yml
+- name: Copy fox_homes_and_project_access page
+  include_tasks: copy_galaxy_fox_access.yml
   when: galaxy_manage_static_setup
   
 - name: Change favicon png file put fox icon

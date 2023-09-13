@@ -107,4 +107,25 @@ class UserHomeFilesSource(PosixFilesSource):
 
 
 
-__all__ = ("UserFtpFilesSource", "LibraryImportFilesSource", "UserLibraryImportFilesSource", "UserHomeFilesSource")
+class UserProjectFilesSource(PosixFilesSource):
+    plugin_type = "gxuserprojects"
+
+    def __init__(self, **kwd: Unpack[PosixFilesSourceProperties]):
+        posix_kwds: PosixFilesSourceProperties = dict(
+	    id="_userprojects",
+            root="/tmp/file_source_test_projects/",
+            label="User Projects Directory",
+            doc="Galaxy User's Projects Directory",
+            writable=True,
+        )
+        posix_kwds.update(kwd)
+        super().__init__(**posix_kwds)
+
+    def get_prefix(self) -> Optional[str]:
+        return None
+
+    def get_scheme(self) -> str:
+        return "gxuserprojects"
+
+
+__all__ = ("UserFtpFilesSource", "LibraryImportFilesSource", "UserLibraryImportFilesSource", "UserHomeFilesSource", "UserProjectFilesSource")
