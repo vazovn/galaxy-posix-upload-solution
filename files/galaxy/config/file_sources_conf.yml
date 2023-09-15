@@ -1,9 +1,33 @@
 
 #  =====================  The permissions for HOME Area =======================
 
-#  0 drwxr-xr-x. 4 root      root                  42 Sep  8 14:10 file_source_test
-#  inside
-#  0 dr-xr-x---. 2 ec-galaxy ec-nikolaiv-group 30 Aug 22 14:36 ec-nikolaiv
+
+#  Tree for HOME:
+#
+#  1.
+#  0 drwxr-xr-x. 5 root      root                  64 Sep 15 09:56 file_source_test
+#
+#     2.
+#     drwxrwx---. 4 ec-galaxy   ec01-galaxy-group 42 Sep 15 09:59 galaxy_imports
+#
+#
+#         3.
+#         drwxr-s---+ 2 ec-nikolaiv ec-nikolaiv-group 56 Sep 15 10:23 ec-nikolaiv
+#
+#
+#         The last group is :
+#
+#         a)
+#         To ensure that ec-galaxy user will have access to the user's directory
+#         setfacl --recursive -m user:ec-galaxy:rx,d:user:ec-galaxy:rx ec-nikolaiv/
+#
+#         b)
+#         To ensure that all the files and dirs will belong to ec-nikolaiv:ec-nikolaiv-group
+#         chmod -R g+s ec-nikolaiv/
+#
+#         This directory belongs to ec-nikolaiv and his personal group only ans is accessible RX only for ec-galaxy by the ACL rule
+
+#  A common galaxy-imports is required because:
 
 #  POSIX ACCESS
 #  Regardless of the logged user, the access to the directories and the upload is a process owned by ec-galaxy
