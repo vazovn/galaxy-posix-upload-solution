@@ -1,0 +1,12 @@
+
+These are the lines which manage the nginx conf:
+
+group_vars/galaxy01-test.educloud.yml
+
+nginx_servers:
+  - redirect-ssl
+nginx_ssl_servers:
+  - galaxy
+
+
+The galaxyproject.galaxy role expects to find two files with these names in templates/nginx/redirect-ssl.j2 and templates/nginx/galaxy.j2

@@ -1,0 +1,7 @@
+---
+
+- name: Copy access use hpc home directory  page
+  copy:
+    src: "files/galaxy/fox_home_and_projects_access/galaxy.py"
+    dest: "{{ galaxy_server_dir }}/lib/galaxy/files/sources/galaxy.py"
+  when: galaxy_server_dir is defined

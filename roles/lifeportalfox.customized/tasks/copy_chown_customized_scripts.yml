@@ -1,0 +1,62 @@
+---
+
+# Create slurm directory and copy scripts for real user job submission which change ownership of job working dir to real user (ran by sudo)
+
+- name: Create the directory scripts for real user support if it does not exist
+  ansible.builtin.file:
+    path: /cluster/galaxy-data/scripts
+    state: directory
+    mode: '0730'
+    group: "{{ galaxy_group_id }}"
+
+- name: Install modified scripts for real user job submission
+  copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+  with_items: "{{ galaxy_scripts_files }}"
+
+
+## SLURM DIR
+- name: Check directory slurm
+  stat: path=/cluster/galaxy-data/slurm
+  register: directory_slurm
+
+- debug: var=directory_slurm.stat.path
+
+- name: Create slurm directory if it doesn't already exist
+  ansible.builtin.file:
+    path: /cluster/galaxy-data/slurm
+    state: directory
+    mode: '0730'
+    group: "{{ galaxy_group_id }}"
+  when: not directory_slurm.stat.exists
+
+## TMP DIR
+- name: Check directory tmp
+  stat: path=/cluster/galaxy-data/tmp
+  register: directory_tmp
+
+- debug: var=directory_tmp.stat.path
+
+- name: Create tmp directory if it doesn't already exist
+  ansible.builtin.file:
+    path: /cluster/galaxy-data/tmp
+    state: directory
+    mode: '0730'
+    group: "{{ galaxy_group_id }}"
+  when: not directory_tmp.stat.exists
+
+## COMPILED TEMPLATES DIR
+- name: Check directory compiled_templates
+  stat: path=/cluster/galaxy-data/compiled_templates
+  register: directory_compiled_templates
+
+- debug: var=directory_compiled_templates.stat.path
+
+- name: Create compiled_templates directory if it doesn't already exist
+  ansible.builtin.file:
+    path: /cluster/galaxy-data/compiled_templates
+    state: directory
+    mode: '0730'
+    group: "{{ galaxy_group_id }}"
+  when: not directory_compiled_templates.stat.exists

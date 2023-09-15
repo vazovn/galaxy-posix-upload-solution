@@ -37,6 +37,9 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
     ]
 
     #DEFAULT_SCOPE = ['openid', 'email', 'groups']
+    # scope for system user
+    #DEFAULT_SCOPE = ['openid', 'email']
+    # scope for real user
     DEFAULT_SCOPE = ['openid', 'profile', 'email']
     JWT_DECODE_OPTIONS = {'verify_at_hash': False}
 
@@ -85,7 +88,6 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
 
         print("========= METHOD === auth_complete ()  in lifeportal_fox.py ======")
 
-
         if self.ACCESS_TOKEN_METHOD == 'GET':
                params = self.auth_complete_params(state)
         else:
@@ -114,14 +116,11 @@ class LifeportalFoxOpenIdConnect(OpenIdConnectAuth):
                    method=self.ACCESS_TOKEN_METHOD
                )
 
-
         self.process_error(response)
         return self.do_auth(response['access_token'], response=response,
                             *args, **kwargs)
 
-
-
-    # parent method in ../venv/.../social_core/backends/base.py
+    # parent method in base.py
     def request(self, url, method='GET', *args, **kwargs):
         kwargs.setdefault('headers', {})
         if self.setting('PROXIES') is not None:

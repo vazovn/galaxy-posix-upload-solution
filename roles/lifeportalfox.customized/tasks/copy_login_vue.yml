@@ -1,7 +1,7 @@
 ---
 
-- name: Copy Login vue file
+- name: Copy Login Form vue file
   copy:
-    src: "files/galaxy/web_files/Login.vue"
-    dest: "{{ galaxy_server_dir }}/client/src/components/login/" 
+    src: "files/galaxy/web_files/LoginForm.vue"
+    dest: "{{ galaxy_server_dir }}/client/src/components/Login/"
   when: galaxy_server_dir is defined
