@@ -1,0 +1,7 @@
+---
+
+- name: Set FOX logo favicon png on the masterhead menu
+  copy:
+    src: "files/galaxy/web_files/fox_man2.png"
+    dest: "{{ galaxy_server_dir }}/static/favicon.png" 
+  when: galaxy_server_dir is defined

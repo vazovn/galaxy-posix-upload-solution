@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="utf-8">
+        <link rel="stylesheet" href="style/base.css" type="text/css" />
+    </head>
+    <body class="m-0">
+        <div class="py-4">
+            <div class="container">
+                <h2>Hello, <strong>Galaxy-Fox</strong> is here!</h2>
+            </div>
+            <br>
+        </div>
+	<div class="container">
+            <p>
+		Galaxy-Fox is a web-based platform allowing the users to launch jobs on a High Performance Computing (HPC) cluster. It gives access to a big set of tools already available in the Fox cluster at UiO but does not require advanced knowledge in scripting and command line operations needed to start heavy computational jobs on a cluster. It is meant for researchers in natural but also social sciences who want quick and easy solutions for their daily challenges.
+            </p>
+            <p>
+		Each tool in the Galaxy-Fox comes with its customized menu and all you have to do is upload your data, fill in the web-page with the desired tool parameters and click on Execute. The Galaxy-Fox  will do the rest for you and will bring you the result back to your browser. From the same web-interface you can share your data with the other users of the Galaxy-Fox, re-run your jobs again with just one click or reproduce yours or other users' work.
+            </p>
+            <p>
+		The Galaxy-Fox  team is here to support you: it will help you to log in, to run your job(s) and to debug your errors. It will also try to install the applications which are missing within reasonable time. Write to us at <a href="mailto:hpc-drift@usit.uio.no">hpc-drift@usit.uio.no</a>.
+            </p>
+            <p>
+            	It is now up to you to enjoy it!
+            </p>
+            <footer>
+                The <a target="_blank" class="reference" href="http://galaxyproject.org/">Galaxy Project</a>
+                is supported in part by <a target="_blank" class="reference" href="http://www.genome.gov">NHGRI</a>,
+                <a target="_blank" class="reference" href="http://www.nsf.gov">NSF</a>,
+                <a target="_blank" class="reference" href="http://www.huck.psu.edu">The Huck Institutes of the Life Sciences</a>,
+                <a target="_blank" class="reference" href="http://www.ics.psu.edu">The Institute for CyberScience at Penn State</a>,
+                and <a target="_blank" class="reference" href="http://www.jhu.edu/">Johns Hopkins University</a>.
+            </footer>
+        </div>
+    </body>
+</html>

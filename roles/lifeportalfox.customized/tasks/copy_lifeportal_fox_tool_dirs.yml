@@ -1,0 +1,20 @@
+---
+
+## Fix Sabry's tool repo
+
+## Git refuses to clone in existing directory
+
+- name: Delete existing directory
+  file:
+    state: absent
+    path: /cluster/galaxy-test/data/tools/prod/
+
+- name: Pull the tool directories from Sabry tool repo
+  git:
+    repo: https://nikolaiv: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@github.uio.no/IT-ITF/sw-portals-team-lifeportal-fox-tools.git
+    dest: "{{ tools_root }}" # /cluster/galaxy-test/data/tools/prod
+    update: yes
+    version: galaxy-test
+  when:  tools_root is defined
+
+

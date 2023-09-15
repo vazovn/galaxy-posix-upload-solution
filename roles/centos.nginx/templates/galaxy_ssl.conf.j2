@@ -1,0 +1,33 @@
+server {
+  listen [::]:443 ssl;
+
+  server_name {{ inventory_hostname }};
+  ssl_certificate      {{ ssl_cert_path }};
+  ssl_certificate_key  {{ ssl_key_path }};
+  ssl_session_timeout 5m;
+  ssl_protocols TLSv1.2;
+  ssl_prefer_server_ciphers on;
+  ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+  ssl_ecdh_curve secp384r1; # Requires nginx >= 1.1.0                                                                                                                                                                                                                                                                     
+  ssl_session_cache shared:SSL:10m;
+
+  add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+#  add_header X-Frame-Options DENY;
+  add_header X-Content-Type-Options nosniff;
+  add_header Cache-Control "max-age=0, no-cache, no-store, private";
+
+  access_log /var/log/nginx/access.log;
+  error_log /var/log/nginx/error.log;
+ 
+  client_max_body_size 2G;
+  proxy_intercept_errors on;
+
+  fastcgi_buffers 16 16k;
+  fastcgi_buffer_size 32k;
+
+  location / {
+    uwsgi_pass {{ galaxy_config.uwsgi.socket }};
+    uwsgi_param UWSGI_SCHEME $scheme;
+    include uwsgi_params;
+  }
+}

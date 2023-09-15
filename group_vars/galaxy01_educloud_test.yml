@@ -1,0 +1,290 @@
+---
+# Python 3 support
+pip_virtualenv_command: /usr/bin/python3 -m virtualenv # 
+pip_package: python3-pip                               # geerlingguy.pip
+
+# PostgreSQL
+postgresql_objects_users:
+  - name: ec-galaxy
+postgresql_objects_databases:
+  - name: galaxytest
+    owner: ec-galaxy
+postgresql_pg_hba_local_socket : true    
+
+# PostgreSQL Backups === TO RESTORE WHEN MOUNT IS READY
+#postgresql_backup_dir: /galaxy/backups
+#postgresql_backup_local_dir: "~postgres/backups"
+#postgresql_backup_mail_recipient: "n.a.vazov@usit.uio.no"
+
+# Nginx
+### variables that are used in the galaxy.conf templates
+### if no ssl, leave the ssl_cert_path and ssl_key_path empty
+use_ssl: true
+ssl_cert_path:  /etc/pki/tls/certs/galaxy01-test_educloud_no.crt ################# TO DO ################
+ssl_key_path: /etc/pki/tls/private/galaxy01-test.educloud.no.key  ################# TO DO ################
+
+# Galaxy
+
+# only for RHEL8 otherwise "true"
+galaxy_create_user: false
+galaxy_separate_privileges: true
+galaxy_manage_paths: true
+galaxy_manage_mutable_setup: true
+galaxy_manage_database: true
+galaxy_fetch_dependencies: true
+galaxy_manage_systemd: yes
+
+# If installing on a root_squash, you need to enable the galaxy user to set up the galaxy.service
+# and set galaxy_systemd_root to false, ..tasks/systemd_galaxy.yml is defining this
+galaxy_systemd_root: false
+
+galaxy_manage_systemd_reports: no
+
+# If the host needs a tunnel to connect to the external world, set to true.
+# It will run the task "Modify Makefile in galaxy server directory" in lifeportalfox.customized role
+galaxy_use_tunnel: false
+
+# Server dir
+galaxy_root: /cluster/galaxy-test/srv/galaxy
+galaxy_server_dir: "{{ galaxy_root }}/server"
+
+# All data dir : job dirs, files, tmp, tools, etc.
+galaxy_lifeportal_data_dir: /cluster/galaxy-test/data
+galaxy_layout: root-dir
+
+# -- Tool related dirs --
+tools_root: "{{ galaxy_lifeportal_data_dir }}/tools/prod"
+tool_config_dir: "{{ tools_root }}/tool_config"
+tool_data_path: "{{ tools_root }}/tool_locs"
+tool_dependency_cache_dir: "{{ tools_root }}//tool_dependencies/_cache"
+tool_dependency_dir: "{{ tools_root }}/tool_dependencies"
+tool_cache_data_dir: "{{ galaxy_root }}/var/cache/tool_cache"
+tool_search_index_dir: "{{ galaxy_root }}/var/cache/tool_search_index"
+
+#----------------------------------------------------------------------
+#galaxy_user: {name: ec-galaxy, shell: /bin/bash, uid: 2100096}
+galaxy_user: ec-galaxy
+galaxy_user_id: 2100096
+#galaxy_group: {name: ec-galaxy-group, gid: 2100210}
+galaxy_group: ec-galaxy-group
+galaxy_group_id: 2100210
+galaxy_privsep_user: "{{ galaxy_user }}"
+#---------------------------------------------------------------------
+galaxy_commit_id: release_21.09
+galaxy_force_checkout: true
+
+# Source and target file directories for oidc backends
+galaxy_oidc_backend_files_src_dir: files/galaxy/oidc_files/
+galaxy_oidc_backend_files_target_dir: "{{ galaxy_venv_dir }}/lib64/python3.6/site-packages/social_core/backends/"
+
+galaxy_config:
+  galaxy:
+#--Admin-------------------------------------------------
+    brand: "TEST-FOX-portal"
+    admin_users: ec-torfin@educloud.no,ec-nikolaiv@educloud.no,ec-sabryr@educloud.no
+    database_connection: "postgresql:///galaxytest?host=/var/run/postgresql"
+    check_migrate_tools: false
+    use_remote_user: false
+    allow_user_impersonation: true
+    require_login: true
+    allow_user_dataset_purge: true
+    expose_dataset_path: true
+    password_expiration_period: 0
+    session_duration: 0
+    allow_user_deletion: true
+    enable_quotas: true
+    allow_user_creation: false
+    show_welcome_with_login: true
+    
+# -- Authentication -------------------------------------------
+    user_activation_on: false
+    track_jobs_in_database: false
+    smtp_server: smtp.uio.no
+    error_email_to: n.a.vazov@usit.uio.no
+    ## email_from is compulsory, otherwise the job error report (from bug icon) sending fails
+    email_from: Galaxy-Fox <ec-galaxy@educloud.no>
+    activation_grace_period: 0
+    
+    # -- OiDC support-(see backend files below)------------------------------------------
+     # Enables and disables OpenID Connect (OIDC) support.
+    enable_oidc: true
+    # Sets the path to OIDC configuration file.
+    oidc_config_file: "{{ galaxy_config_dir }}/oidc_config.xml"
+    # Sets the path to OIDC backends configuration file.
+    oidc_backends_config_file: "{{ galaxy_config_dir }}/oidc_backends_config.xml"
+    # Use this file to remove the email/password/login_button promt
+    auth_config_file: "{{ galaxy_config_dir }}/auth_conf.xml"
+
+#--Standard Config-------------------------------------------
+    welcome_url: /static/welcome.html
+    galaxy_infrastructure_url: https://galaxy01-test.educloud.no
+
+#-- Cluster partition based directories -----------------------------
+    file_path: "{{ galaxy_lifeportal_data_dir }}/files"
+    new_file_path: "{{ galaxy_lifeportal_data_dir }}/tmp"
+    template_cache_path: "{{ galaxy_lifeportal_data_dir }}/compiled_templates"
+    job_working_directory: "{{ galaxy_lifeportal_data_dir }}/jobs_directory"
+    cluster_files_directory: "{{ galaxy_lifeportal_data_dir }}/slurm"
+    
+#--Jobs Configuration----------------------------------------
+
+    # SABRY's files from Lifeportal SAGA
+
+    job_config_file: "{{ tools_root }}/tool_config/lifeportal_job_conf.xml"
+    job_resource_params_file:  "{{ tools_root }}/tool_config/lifeportal_job_resource_conf.xml"
+    
+    #job_config_file: "{{ tools_root }}/tool_config/job_conf.xml"
+    #job_resource_params_file:  "{{ tools_root }}/tool_config/job_resource_params_conf.xml"
+    
+    cleanup_job: never
+
+  #--  Conda setup -------------------
+    #conda_prefix: "{{ galaxy_tool_dependency_dir }}/_conda"
+    #conda_exec: "{{ galaxy_tool_dependency_dir }}/_conda/bin/conda"
+    #conda_debug: "false"
+    #conda_ensure_channels: "iuc,conda-forge,bioconda,defaults,imperial-college-research-computing"
+    #conda_auto_install: "false"
+    #conda_auto_init: "true"
+    #conda_copy_dependencies: true
+    
+#-- Tool Configuration----------------------------------------
+
+    # SABRY's files from Lifeportal SAGA
+    
+    tool_data_table_config_path: "{{ tool_config_dir }}/lifeportal_genomes_conf.xml"
+    tool_config_file: "{{ tool_config_dir }}/lifeportal_tool_conf.xml,{{ tool_config_dir }}/lifeportal_general_tool_conf.xml"
+    integrated_tool_panel_config: "{{ tool_config_dir }}/integrated_tool_panel.xml"
+    datatypes_config_file: "{{ galaxy_root }}/config/datatypes_conf.xml"
+    
+    # This block is new - after 21.09. It means that the packages (the PATHs) 
+    # will be resolved as being located in the 'tool_dependency_dir' and binaries' PATH will 
+    # be derived from the <requirement> block in the respective tool wrapper file. Version is mandatory
+    
+    dependency_resolvers:
+    - type: galaxy_packages
+      versionless: false
+      base_path: "{{ tool_dependency_dir }}"
+  
+  uwsgi:
+    socket: 127.0.0.1:8080
+    #http: 0.0.0.0:8080
+    buffer-size: 16384
+    processes: 1
+    threads: 4
+    offload-threads: 2
+    static-map:
+      - /static={{ galaxy_server_dir }}/static
+      - /favicon.ico={{ galaxy_server_dir }}/static/favicon.ico
+    static-safe: client/galaxy/images
+    master: true
+    virtualenv: "{{ galaxy_venv_dir }}"
+    pythonpath: "{{ galaxy_server_dir }}/lib"
+    module: galaxy.webapps.galaxy.buildapp:uwsgi_app()
+    thunder-lock: true
+    die-on-term: true
+    hook-master-start:
+      - unix_signal:2 gracefully_kill_them_all
+      - unix_signal:15 gracefully_kill_them_all
+    py-call-osafterfork: true
+    enable-threads: true
+    mule:
+      - lib/galaxy/main.py
+      - lib/galaxy/main.py
+    farm: job-handlers:1,2
+
+#-- Galaxy dirs ---------------------
+galaxy_dirs:
+  - "{{ galaxy_mutable_data_dir }}"
+  - "{{ galaxy_mutable_config_dir }}"
+  - "{{ galaxy_cache_dir }}"
+  - "{{ galaxy_shed_tools_dir }}"
+  - "{{ galaxy_tool_dependency_dir }}"
+  - "{{ galaxy_file_path }}"
+  - "{{ galaxy_job_working_directory }}"
+  - "{{ tools_root }}"
+  - "{{ tool_config_dir }}"
+  - "{{ tool_data_path }}"
+  - "{{ tool_dependency_cache_dir }}"
+  - "{{ tool_dependency_dir }}"
+  - "{{ tool_cache_data_dir }}"
+  - "{{ tool_search_index_dir }}"
+  
+
+#-- Galaxy Config Files-----------------------------------
+galaxy_config_files:
+ 
+  # SABRY's files from Lifeportal SAGA
+ 
+  #- src: files/galaxy/config/lifeportal_genomes_conf.xml
+    #dest: "{{ tool_config_dir }}/lifeportal_genomes_conf.xml"
+ 
+  #- src: files/galaxy/config/lifeportal_tool_conf.xml
+    #dest: "{{ tool_config_dir }}/lifeportal_tool_conf.xml"
+    
+  #- src: files/galaxy/config/lifeportal_general_tool_conf.xml
+    #dest: "{{ tool_config_dir }}/lifeportal_general_tool_conf.xml"
+
+  #- src: files/galaxy/config/lifeportal_job_conf.xml
+    #dest: "{{ galaxy_config.galaxy.job_config_file }}"
+    
+  #- src: files/galaxy/config/lifeportal_job_resource_conf.xml
+    #dest: "{{ galaxy_config.galaxy.job_resource_params_file }}"
+    
+  #- src: files/galaxy/config/tool_conf.xml
+    #dest: "{{ tool_config_dir }}/tool_conf.xml"
+    
+  #- src: files/galaxy/config/job_conf.xml
+    #dest: "{{ galaxy_config.galaxy.job_config_file }}"
+    
+  #- src: files/galaxy/config/job_resource_params_conf.xml
+    #dest: "{{ galaxy_config.galaxy.job_resource_params_file }}"
+    
+  - src: files/galaxy/config/datatypes_conf.xml
+    dest: "{{ galaxy_root }}/config/datatypes_conf.xml"
+    
+  - src: files/galaxy/config/oidc_backends_config.xml
+    dest: "{{ galaxy_root }}/config/oidc_backends_config.xml"
+    
+  - src: files/galaxy/config/oidc_config.xml
+    dest: "{{ galaxy_root }}/config/oidc_config.xml"
+    
+  - src: files/galaxy/config/auth_conf.xml
+    dest: "{{ galaxy_root }}/config/auth_conf.xml"
+
+
+#-- Local Tools ----------------------------------------
+galaxy_local_test_tools:
+  - testing_static_slurm.xml
+
+  
+#-- OIDC backend items (files) ----------------------------------------
+galaxy_oidc_backend_files:
+  - lifeportal_fox.py
+
+#-- LMOD activation scripts ----------------------------------------
+#lmod_activation_scripts:
+# - z00_lmod.sh
+#  - z01_StdEnv.sh
+
+#-- Local  Interactive Tools -------------------------------
+
+## copied by the task "copy_local_*_tools.yml" in role: galaxyhepp.customized
+
+#galaxy_local_interactive_tools:
+  #- interactivetool_jupyter_notebook_fys5555.xml
+  #- interactivetool_comphep.xml
+  #- default_notebook.ipynb
+
+
+#-- Dynamic Job Rules Files------------------------------
+galaxy_dynamic_job_rules:
+  - generate_slurm_job_params.py
+  - destinations.py
+
+# systemd
+#galaxy_systemd_mode: mule - defined in defaults/main.yml
+__galaxy_systemd_memory_limit_merged: 
+    mule: 32
+galaxy_systemd_env: [DRMAA_LIBRARY_PATH="/drmaa/lib/libdrmaa.so.1"]
+#galaxy_restart_handler_name: - defined in defaults/main.yml
+

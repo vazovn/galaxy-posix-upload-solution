@@ -1,0 +1,13 @@
+---
+
+# The lmod_activation_scripts are not being used by this playbook
+# We just keep them if needed in future setups
+
+- name: Copy lifeportal fox lmod activation scripts
+  become: yes
+  become_user: root
+  copy:
+    src: "files/galaxy/tools/lmod_source_scripts/{{ item }}"
+    dest: "/etc/profile.d/{{ item }}"
+  with_items: "{{ lmod_activation_scripts }}"
+  when:  lmod_activation_scripts

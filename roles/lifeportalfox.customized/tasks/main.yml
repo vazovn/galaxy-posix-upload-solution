@@ -1,0 +1,87 @@
+---
+
+- name: Copy welcome page
+  include_tasks: copy_welcome_page.yml
+  when: galaxy_manage_static_setup
+  
+- name: Change favicon png file put fox icon
+  include_tasks: copy_favicon_png.yml
+  when: galaxy_manage_static_setup  
+  
+# Task "Copy LMOD activation scripts" is deactivated now. Can be used in future setups
+
+#- name: Copy LMOD activation scripts
+  #include_tasks: copy_lifeportal_fox_lmod_activation_scripts.yml
+  #when: galaxy_manage_static_setup
+
+## Tasks related to the modification of the front page (login page with Educloud) ## 
+- name: Modify Login vue file
+  include_tasks: copy_login_vue.yml
+  when: galaxy_manage_static_setup
+
+## The following task is necessary only when the host has no connection to the outside world!!
+## Activate 'galaxy_use_tunnel' in the group_vars/galaxy01_educloud_test.yml
+- name: Modify Makefile in galaxy server directory
+  lineinfile:
+    path: "{{ galaxy_server_dir }}/Makefile"
+    backup: yes
+    state: present
+    insertafter : "^YARN_INSTALL_OPTS"
+    line: "{{ item }}"
+  with_items:
+   - 'HTTPS_PROXY=http://localhost:3128'
+   - 'HTTP_PROXY=http://localhost:3128'
+  when: galaxy_use_tunnel
+
+- name: Run make client again after Modify Login vue file and Modify Makefile
+  shell: "source  /cluster/galaxy-test/srv/galaxy/venv/bin/activate && cd /cluster/galaxy-test/srv/galaxy/server && /usr/bin/make client"
+
+## === This task will be used to install tools  === ##
+- name: Make the lifeportal fox tool directories
+  include_tasks: copy_lifeportal_fox_tool_dirs.yml
+  when: galaxy_manage_static_setup
+
+## OIDC  - Educloud  configuration tasks ##
+- name: Include lifeportal_fox social_backend
+  include_tasks: copy_lifeportal_fox_backend.yml
+  when: galaxy_manage_static_setup
+  
+- name: Insert fox image in managers py
+  lineinfile:
+          path: "{{ galaxy_server_dir }}/lib/galaxy/authnz/managers.py"
+          backup: yes
+          insertafter : "^DEFAULT_OIDC_IDP_ICONS"
+          line: "    'lifeportalfox': 'https://www.usit.uio.no/bilder/fox_man2.png?vrtx=thumbnail',"
+
+- name: Insert lifeportalfox backend in psa authnz py
+  lineinfile:
+          path: "{{ galaxy_server_dir }}/lib/galaxy/authnz/psa_authnz.py"
+          backup: yes
+          insertafter: "^BACKENDS "
+          line: "    'lifeportalfox': 'social_core.backends.lifeportal_fox.LifeportalFoxOpenIdConnect',"
+
+- name: Insert  lifeportalfox backend name in psa authnz py
+  lineinfile:
+          path: "{{ galaxy_server_dir }}/lib/galaxy/authnz/psa_authnz.py"
+          backup: yes
+          insertafter: "^BACKENDS_NAME"
+          line: "    'lifeportalfox': 'lifeportalfox',"
+
+## Job parameters management tasks ##
+
+## Delete 7 lines after line containing JOB_RESOURCE_CONDITIONAL_XML
+- name: Edit  JOB_RESOURCE_CONDITIONAL_XML  in jobs_init_py 
+  shell: "/usr/bin/sed -i.bak -e '/JOB_RESOURCE_CONDITIONAL_XML = \"\"\"<conditional name=\"__job_resource\"/,+7d' /cluster/galaxy-test/srv/galaxy/server/lib/galaxy/jobs/__init__.py"
+
+## Set the new values to JOB_RESOURCE_CONDITIONAL_XML
+- name: Insert correct order of job parameteres in jobs_init_py 
+  lineinfile:
+          path: "{{ galaxy_server_dir }}/lib/galaxy/jobs/__init__.py"
+          backup: yes
+          insertafter: "    DEFAULT_HANDLER_READY_WINDOW_SIZE"
+          line: "    JOB_RESOURCE_CONDITIONAL_XML = \"\"\"<conditional name=\"__job_resource\"><param name=\"__job_resource__select\" type=\"select\" label=\"Job Resource Parameters\"><option value=\"yes\">Specify job resource parameters</option><option value=\"no\">Use default job resource parameters</option></param><when value=\"no\"/><when value=\"yes\"/></conditional>\"\"\""
+
+
+
+
+
