@@ -19,9 +19,9 @@
   #when: galaxy_manage_static_setup
 
 ## Tasks related to the modification of the front page (login page with Educloud) ## 
-#- name: Modify Login vue file
-#  include_tasks: copy_login_vue.yml
-#  when: galaxy_manage_static_setup
+- name: Modify Login vue file
+  include_tasks: copy_login_vue.yml
+  when: galaxy_manage_static_setup
 
 ## The following task is necessary only when the host has no connection to the outside world!!
 ## Activate 'galaxy_use_tunnel' in the group_vars/galaxy01_educloud_test.yml
@@ -37,8 +37,8 @@
    - 'HTTP_PROXY=http://localhost:3128'
   when: galaxy_use_tunnel
 
-#- name: Run make client again after Modify Login vue file and Modify Makefile
-#  shell: "source  /cluster/galaxy-test/srv/galaxy/venv/bin/activate && cd /cluster/galaxy-test/srv/galaxy/server && /usr/bin/make client"
+- name: Run make client again after Modify LoginForm vue file and Modify Makefile
+  shell: "source  /cluster/galaxy-test/srv/galaxy/venv/bin/activate && cd /cluster/galaxy-test/srv/galaxy/server && npm update caniuse-lite browserslist  && /usr/bin/make client"
 
 ## === This task will be used to install tools  === ##
 - name: Make the lifeportal fox tool directories

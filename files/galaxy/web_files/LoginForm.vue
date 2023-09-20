@@ -3,10 +3,9 @@
         <div class="row justify-content-md-center">
             <template v-if="!confirmURL">
                 <div class="col col-lg-6">
-                    <b-alert :show="!!messageText" :variant="messageVariant">
+                    <b-alert :show="messageShow" :variant="messageVariant" v-html="messageText" />
                         <span v-html="messageText" />
-                    </b-alert>
-                    <b-form id="login" @submit.prevent="submitLogin()">
+                                   <b-form id="login" @submit.prevent="submitLogin()">
                         <b-card no-body header="Welcome to the Galaxy-FOX : the Galaxy portal to the Fox cluster at UiO">
                             <b-card-body>
                                 <div>
@@ -21,7 +20,7 @@
                                                 </p>
 											    </b-form-text>
 											    <b-form-text>
-                                                2. Install Google, Microsoft or another authenticator on your smartphone and scan the QR-code for 2 factor authentication (2FA)
+                                                2. Install Google, Microsoft or another authenticator on your smartphone and scan the QR-code for 2 factor authentication (2FA). See <a href="https://www.uio.no/english/services/it/research/platforms/edu-research/help/two-factor-authentication.html">instructions here</a>
                                                 </p>
 												</b-form-text>
 												<b-form-text>
@@ -29,11 +28,10 @@
                                                 </p>
 											</b-form-text>
                                     </b-form-group>
-
                                 </div>
                                 <div v-if="enableOidc">
                                     <!-- OIDC login-->
-                                    <external-login :login_page="true" />
+                                    <external-login :login_page="true" :exclude_idps="[connectExternalProvider]" />
                                 </div>
                             </b-card-body>
                                 <div class="row justify-content-md-center">
@@ -102,6 +100,7 @@ export default {
         },
     },
     data() {
+        const urlParams = new URLSearchParams(window.location.search);
         return {
             login: null,
             password: null,
@@ -111,13 +110,13 @@ export default {
             headerWelcome: _l("Welcome to Galaxy, please log in"),
             labelNameAddress: _l("Public Name or Email Address"),
             labelPassword: _l("Password"),
+            confirmURL: urlParams.has("confirm") && urlParams.get("confirm") == "true",
+            connectExternalEmail: urlParams.get("connect_external_email"),
+            connectExternalProvider: urlParams.get("connect_external_provider"),
+            connectExternalLabel: urlParams.get("connect_external_label"),
         };
     },
     computed: {
-        confirmURL() {
-            var urlParams = new URLSearchParams(window.location.search);
-            return urlParams.has("confirm") && urlParams.get("confirm") == "true";
-        },
         welcomeUrlWithRoot() {
             return withPrefix(this.welcomeUrl);
         },
@@ -128,6 +127,9 @@ export default {
         },
         submitLogin() {
             let redirect = this.redirect;
+            if (this.connectExternalEmail) {
+                this.login = this.connectExternalEmail;
+            }
             if (localStorage.getItem("redirect_url")) {
                 redirect = localStorage.getItem("redirect_url");
             }
@@ -144,6 +146,8 @@ export default {
                     }
                     if (data.expired_user) {
                         window.location = withPrefix(`/root/login?expired_user=${data.expired_user}`);
+                    } else if (this.connectExternalProvider) {
+                        window.location = withPrefix("/user/external_ids?connect_external=true");
                     } else if (data.redirect) {
                         window.location = encodeURI(data.redirect);
                     } else {
@@ -152,8 +156,13 @@ export default {
                 })
                 .catch((error) => {
                     this.messageVariant = "danger";
-                    const message = error.response.data && error.response.data.err_msg;
-                    this.messageText = message || "Login failed for an unknown reason.";
+                    const message = error.response && error.response.data && error.response.data.err_msg;
+                    if (this.connectExternalProvider && message && message.toLowerCase().includes("invalid")) {
+                        this.messageText =
+                            message + " Try logging in to the existing account through an external provider below.";
+                    } else {
+                        this.messageText = message || "Login failed for an unknown reason.";
+                    }
                 });
         },
         setRedirect(url) {
@@ -171,6 +180,9 @@ export default {
                     const message = error.response.data && error.response.data.err_msg;
                     this.messageText = message || "Password reset failed for an unknown reason.";
                 });
+        },
+        returnToLogin() {
+            window.location = withPrefix("/login/start");
         },
     },
 };
