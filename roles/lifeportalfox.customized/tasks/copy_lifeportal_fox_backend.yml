@@ -7,6 +7,14 @@
   with_items: "{{ galaxy_oidc_backend_files | default([]) }}"
   when:  galaxy_oidc_backend_files is defined
   
+- name: Print CLIENT ID
+  debug:
+      msg: "This is CLIENT ID : {{ CLIENT_ID }}"
+
+- name: Print CLIENT SECRET
+  debug:
+      msg: "This is CLIENT SECRET {{ CLIENT_SECRET }}"
+
 - name: Replace CLIENT_ID variable
   ansible.builtin.replace:
     path: "{{ galaxy_root }}/config/oidc_backends_config.xml"

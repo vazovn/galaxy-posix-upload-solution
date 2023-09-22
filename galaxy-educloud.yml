@@ -3,8 +3,8 @@
   become: true
   vars:
       galaxy_diff_mode_verbose: true
-      CLIENT_ID:  "{{ lookup('file', '/uio/kant/usit-ft-u1/nikolaiv/galaxy-fox-oidc-secrets/client_test_id') }}"
-      CLIENT_SECRET:  "{{ lookup('file', '/uio/kant/usit-ft-u1/nikolaiv/galaxy-fox-oidc-secrets/client_test_secret') }}"
+      CLIENT_ID: "{{ client_id }}"
+      CLIENT_SECRET: "{{ client_secret }}"
   pre_tasks:
     - name: Install Dependencies
       package:
