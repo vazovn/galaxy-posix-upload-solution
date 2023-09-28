@@ -5,3 +5,9 @@
     src: "files/galaxy/fox_home_and_projects_access/galaxy.py"
     dest: "{{ galaxy_server_dir }}/lib/galaxy/files/sources/galaxy.py"
   when: galaxy_server_dir is defined
+  
+- name: Copy edited posix file for cluster project directory page
+  copy:
+    src: "files/galaxy/fox_home_and_projects_access/posix.py"
+    dest: "{{ galaxy_server_dir }}/lib/galaxy/files/sources/posix.py"
+  when: galaxy_server_dir is defined
