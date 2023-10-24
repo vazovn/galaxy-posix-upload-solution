@@ -79,6 +79,7 @@
       - chown root:ec01-galaxy-group drmaa_external_runner.py
       - chown root:ec01-galaxy-group drmaa_external_killer.py
       - chown root:ec01-galaxy-group external_chown_script.py
+      - chown root:ec01-galaxy-group list_cluster_directories.py
       changed_when: false
 
     - name: Set 500 to the permission escalating scripts used for real user setup

@@ -1,56 +1,8 @@
 
-#  =====================  The permissions for HOME Area =======================
-
-
-#  Tree for HOME:
-#
-#  1.
-#  0 drwxr-xr-x. 5 root      root                  64 Sep 15 09:56 file_source_test
-#
-#     2.
-#     drwxrwx---. 4 ec-galaxy   ec01-galaxy-group 42 Sep 15 09:59 galaxy_imports
-#
-#
-#         3.
-#         drwxr-s---+ 2 ec-nikolaiv ec-nikolaiv-group 56 Sep 15 10:23 ec-nikolaiv
-#
-#
-#         The last group is :
-#
-#         a)
-#         To ensure that ec-galaxy user will have access to the user's directory
-#         setfacl --recursive -m user:ec-galaxy:rx,d:user:ec-galaxy:rx ec-nikolaiv/
-#
-#         b)
-#         To ensure that all the files and dirs will belong to ec-nikolaiv:ec-nikolaiv-group
-#         chmod -R g+s ec-nikolaiv/
-#
-#         This directory belongs to ec-nikolaiv and his personal group only ans is accessible RX only for ec-galaxy by the ACL rule
-
-#  A common galaxy-imports is required because:
-
-#  POSIX ACCESS
-#  Regardless of the logged user, the access to the directories and the upload is a process owned by ec-galaxy
-
-#  DISPLAY IN GALAXY GUI
-#  The display of the logged user home directory is carried out by ec-galaxy user but is filtered by the value username
-#  ../lib/galaxy/files/sources/galaxy.py  where the path shall contain the username of the logged user
-#  root="/tmp/file_source_test/${user.username}/"
-
-
 - type: gxuserhome
   id: userhome
   doc: Get your data from FOX home area
   label: FOX Home Area
-
-
-#  ===================== The permissions for PROJECT Area =======================
-
-# 0 drwxr-xr-x. 6 root      root                  54 Sep 12 15:18 file_source_test_projects
-# inside
-# 0 drwxr-x---. 2 root ec01-member-group          27 Sep 12 15:21 ec01
-
-# The access to the project directory is limited to the group, root remains to be the owner
 
 
 - type: gxuserprojects

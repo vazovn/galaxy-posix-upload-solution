@@ -2,6 +2,10 @@
 import logging
 import re
 from subprocess import check_output
+import subprocess
+import galaxy.util
+import shlex
+from galaxy.structured_app import MinimalManagerApp
 log = logging.getLogger(__name__)
 # Nikolay's imports
 
@@ -61,14 +65,32 @@ class PosixFilesSource(BaseFilesSource):
         self.allow_subdir_creation = props.get("allow_subdir_creation", DEFAULT_ALLOW_SUBDIR_CREATION)
 
     ### Nikolay
-    
-    ### This method filters the display of the "Chose remote files". 
-    ### Only the dirs owned by a group the user is member of will be shown
-    
-    def _get_accessible_ec_member_projects_dirs(self, full_dir_list=None, username=None):
+    ### The next five methods filter the display of the "Chose remote files" - Access FOX projects.
+
+    @property
+    def _list_posix_dirs(self):
+        return self._file_sources_config.list_cluster_directories_script
+
+    def _list_as_real_user(self, path, username, list_cluster_directories_script):
+       """
+       Lists the content of path as the logged user
+       """
+       try:
+           if not list_cluster_directories_script:
+               raise ValueError("list_cluster_directories_script is not defined")
+           cmd = shlex.split(list_cluster_directories_script)
+           cmd.extend([username, path])
+           res = galaxy.util.commands.execute(cmd)
+           return res
+       except galaxy.util.commands.CommandLineException as e:
+           log.warning(f"Listing {path} as {username} failed: {galaxy.util.unicodify(e)}")
+           return False
+
+    ### Only the project dirs owned by a group the user is member of will be shown
+    def _get_accessible_common_dirs(self, full_dir_list=None, username=None):
         # get group membership of the logged user
         group_list  = check_output(['groups', username]).split()
-        # filter only "ecXX-member-groups" 
+        # filter only "ecXX-member-groups"
         ecXX_member_groups = []
         for group in group_list:
             if re.match('^ec[0-9]+\-member\-group$', group.decode()):
@@ -81,13 +103,35 @@ class PosixFilesSource(BaseFilesSource):
                    filtered_dirs.append(dir)
         return filtered_dirs
 
+    ### List the content of the selected project directory using the logged user permissions
+    def _get_user_accessible_data_in_common_dirs(self, username=None, path=None):
+
+        ## This list_as_real_user method is called  from util/path/__init__.py
+        unparsed_accessible = self._list_as_real_user(path, username, self._list_posix_dirs)
+        #log.debug(" ============= RETURN FROM LIST CLUSTER DIRS SCRIPT ========  %s " % unparsed_accessible)
+        if re.search('Permission denied',unparsed_accessible):
+            raise Exception("Permission denied!")
+        ## Remove "[" and other chars
+        acessible_dirs_and_files = re.findall(r"'(.*?)'", unparsed_accessible, re.DOTALL)
+
+        ## Get also short list with file/dir names only
+        names_only_acessible_dirs_and_files = []
+       	for index,element in enumerate(acessible_dirs_and_files):
+            index = index +1
+            if index % 4 == 0:
+                names_only_acessible_dirs_and_files.append(element)
+        return (acessible_dirs_and_files, names_only_acessible_dirs_and_files)
 
     def _list(self, path="/", recursive=True, user_context=None, opts: Optional[FilesSourceOptions] = None):
         if not self.root:
             raise exceptions.ItemAccessibilityException("Listing files at file:// URLs has been disabled.")
         dir_path = self._to_native_path(path, user_context=user_context)
-        if not self._safe_directory(dir_path):
+
+        ## Nikolay
+        ## Disable the check for cluster directories
+        if not self._safe_directory(dir_path) and self._list_posix_dirs is None:
             raise exceptions.ObjectNotFound(f"The specified directory does not exist [{dir_path}].")
+
         if recursive:
             res: List[Dict[str, Any]] = []
             effective_root = self._effective_root(user_context)
@@ -98,23 +142,29 @@ class PosixFilesSource(BaseFilesSource):
                 res.extend(map(to_dict, files))
             return res
         else:
-            res = os.listdir(dir_path)
+            if self._list_posix_dirs is not None:
+                #log.debug(" ========= LIST CLUSTER DIR USED !!!  ================== dir path %s " % dir_path)
+                if "projects" in self._effective_root(user_context) and not re.search('/ec[0-9]+',dir_path):
+                    # all directories in project filesystem
+                    res_full = os.listdir(dir_path)
+                    # get ony projects where the  real user is a member
+                    res = self._get_accessible_common_dirs(full_dir_list=res_full, username=user_context.username)
+                    to_dict = functools.partial(self._resource_info_to_dict, path, user_context=user_context)
+                    #log.debug(" ========= FIRST PASS LIST DIR  ================== %s " % list(map(to_dict, res)))
+                else:
+                    (res_full,res) = self._get_user_accessible_data_in_common_dirs(username=user_context.username, path=dir_path)
+                    list_array_per_file = [res_full[n:n+4] for n in range(0, len(res_full), 4)]
+                    to_dict = functools.partial(self._resource_info_to_dict_for_cluster, path, user_context=user_context, dir_list=list_array_per_file)
+                    #log.debug(" ========= SECOND AND NEXT PASSES LIST DIR ================== %s " % list(map(to_dict, res)))
 
-            ### Nikolay
-            
-            # 1. first condition checks if we _do actually_ list the cluster (FOX) projects dirs 
-            # (effective root is defined in ../files/sources/galaxy.py in UserProjectFilesSource class
-            
-            # 2. second "and not" condition shall drop the filter to the content of ecXX subdirs - 
-            # they shall not be filtered after the first filter has been passed : 
-            # dir_path value gets extended by subdirs at every next GUI click, 
-            # e.g. first pass // , second pass //ec73, thirs pass //ec73/somedir etc.
-            
-            if "projects" in self._effective_root(user_context) and not re.search('/ec[0-9]+$',dir_path):
-                res = self._get_accessible_ec_member_projects_dirs(full_dir_list=res, username=user_context.username)
+                return list(map(to_dict, res))
 
-            to_dict = functools.partial(self._resource_info_to_dict, path, user_context=user_context)
-            return list(map(to_dict, res))
+            else:
+                #log.debug(" ========= LIST CLUSTER DIR NOT USED !!!  ================== dir path %s " % dir_path)
+                res = os.listdir(dir_path)
+                to_dict = functools.partial(self._resource_info_to_dict, path, user_context=user_context)
+                #log.debug(" ========= PASSES  ================== %s " % list(map(to_dict, res)))
+                return list(map(to_dict, res))
 
     def _realize_to(
         self, source_path: str, native_path: str, user_context=None, opts: Optional[FilesSourceOptions] = None
@@ -170,18 +220,34 @@ class PosixFilesSource(BaseFilesSource):
         rel_path = os.path.normpath(os.path.join(dir, name))
         full_path = self._to_native_path(rel_path, user_context=user_context)
         uri = self.uri_from_path(rel_path)
+
         if os.path.isdir(full_path):
             return {"class": "Directory", "name": name, "uri": uri, "path": rel_path}
         else:
-            statinfo = os.lstat(full_path)
-            return {
-                "class": "File",
-                "name": name,
-                "size": statinfo.st_size,
-                "ctime": self.to_dict_time(statinfo.st_ctime),
-                "uri": uri,
-                "path": rel_path,
-            }
+                statinfo = os.lstat(full_path)
+                return {
+                    "class": "File",
+                    "name": name,
+                    "size": statinfo.st_size,
+                    "ctime": self.to_dict_time(statinfo.st_ctime),
+                    "uri": uri,
+                    "path": rel_path,
+                }
+
+    ## Method returning dirs and files from list_cluster_directories_script.py script
+    def _resource_info_to_dict_for_cluster(self, dir: str, name: str, user_context=None, dir_list=None):
+        rel_path = os.path.normpath(os.path.join(dir, name))
+        full_path = self._to_native_path(rel_path, user_context=user_context)
+        uri = self.uri_from_path(rel_path)
+        for element in dir_list:
+            if name in element and element[0].startswith('d'):
+                directory = {'class': 'Directory', 'name': element[3], "uri": uri, "path": rel_path}
+                return directory
+            if name in element and element[0].startswith('-r'):
+                filename = {"class": "File", "name": element[3], "size": element[1], "ctime": element[2], "uri": uri, "path": rel_path}
+                return filename
+            else:
+                pass
 
     def _safe_directory(self, directory):
         if self.enforce_symlink_security:
@@ -189,7 +255,6 @@ class PosixFilesSource(BaseFilesSource):
                 raise exceptions.ConfigDoesNotAllowException(
                     f"directory ({directory}) is a symlink to a location not on the allowlist"
                 )
-
         if not os.path.exists(directory):
             return False
         return True

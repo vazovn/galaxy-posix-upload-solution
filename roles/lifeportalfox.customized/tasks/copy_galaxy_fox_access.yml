@@ -5,9 +5,112 @@
     src: "files/galaxy/fox_home_and_projects_access/galaxy.py"
     dest: "{{ galaxy_server_dir }}/lib/galaxy/files/sources/galaxy.py"
   when: galaxy_server_dir is defined
-  
+
 - name: Copy edited posix file for cluster project directory page
   copy:
     src: "files/galaxy/fox_home_and_projects_access/posix.py"
     dest: "{{ galaxy_server_dir }}/lib/galaxy/files/sources/posix.py"
   when: galaxy_server_dir is defined
+
+
+# Block for file ..lib/galaxy/files/__init__.py 5 instances
+- name: 1 Edit the file lib galaxy files init py Line 1 in method init
+  lineinfile:
+             path: "{{ galaxy_server_dir }}/lib/galaxy/files/__init__.py"
+             backup: yes
+             insertafter: '.*ftp_upload_purge=True.*'
+             line: "        list_cluster_directories_script=None,"
+
+- name: 2 Edit the file lib galaxy files init py Line 2 in method init
+  lineinfile:
+             path: "{{ galaxy_server_dir }}/lib/galaxy/files/__init__.py"
+             backup: yes
+             insertafter : '.*self.ftp_upload_purge = ftp_upload_purge.*'
+             line: "        self.list_cluster_directories_script = list_cluster_directories_script"
+
+- name: 3 Edit the file lib galaxy files init py Line in method from app config
+  lineinfile:
+             path: "{{ galaxy_server_dir }}/lib/galaxy/files/__init__.py"
+             backup: yes
+             insertafter: '.*kwds\["ftp_upload_purge"\] = config.ftp_upload_purge.*'
+             line: "        kwds[\"list_cluster_directories_script\"] = config.list_cluster_directories_script"
+
+- name: 4 Edit the file lib galaxy files init py Line in method to dict
+  lineinfile:
+             path: "{{ galaxy_server_dir }}/lib/galaxy/files/__init__.py"
+             backup: yes
+             insertafter: '.*"ftp_upload_purge": self.ftp_upload_purge.*'
+             line: "            \"list_cluster_directories_script\": self.list_cluster_directories_script,"
+
+- name: 5 Edit the file lib galaxy files init py Line in staticmethod method to dict
+  lineinfile:
+             path: "{{ galaxy_server_dir }}/lib/galaxy/files/__init__.py"
+             backup: yes
+             insertafter: '.*ftp_upload_purge=as_dict\["ftp_upload_purge"\].*'
+             line: "            list_cluster_directories_script=as_dict[\"list_cluster_directories_script\"]"
+
+## The two next modify the Permission denied message
+
+# Set the {mark} for ansible blockinfile for Permission denied message
+- name: Set BEGIN END markers for the new Permissions denied block
+  lineinfile:
+          path: "{{ galaxy_server_dir }}/lib/galaxy/managers/remote_files.py"
+          backup: yes
+          insertbefore:  '{{item.Before}}'
+          line: "{{item.Line}}"
+  with_items:
+         - { Before: 'try:', Line: "### OPEN ANSIBLE MANAGED BLOCK ###"}
+         - { Before: 'elif format == RemoteFilesFormat.jstree:', Line: "### CLOSE ANSIBLE MANAGED BLOCK ###"}
+
+
+## Better display of permission denied
+- name: Replace the message to Permission denied
+  blockinfile:
+    path: "{{ galaxy_server_dir }}/lib/galaxy/managers/remote_files.py"
+    marker: "### {mark} ANSIBLE MANAGED BLOCK ###"
+    marker_begin: "OPEN"
+    marker_end: "CLOSE"
+    block: |
+            {% filter indent(width=8, first=true) %}
+            try:
+                index = file_source.list(file_source_path.path, recursive=recursive, user_context=user_file_source_context)
+            except exceptions.MessageException:
+                log.warning(f"Problem listing file source path {file_source_path}", exc_info=True)
+                raise
+            except Exception:
+            ## Nikolay
+            ## A better display of Permission denied error when trying to list cluster project directories
+                if "list_cluster_directories_script" in self._app.config.config_dict and self._app.config.config_dict["list_cluster_directories_script"] is not None:
+                    message = f"Permission denied {file_source_path.path}"
+                    log.warning(message, exc_info=True)
+                    raise exceptions.InternalServerError(message)
+                else:
+                    message = f"Problem listing file source path {file_source_path}"
+                    log.warning(message, exc_info=True)
+                    raise exceptions.InternalServerError(message)
+            if format == RemoteFilesFormat.flat:
+                # rip out directories, ensure sorted by path
+                index = [i for i in index if i["class"] == "File"]
+                index = sorted(index, key=itemgetter("path"))
+            {% endfilter %}
+
+
+- name: Add list_cluster_directories config schema yaml
+  blockinfile:
+    state: present
+    insertafter: EOF
+    dest: "{{ galaxy_server_dir }}/lib/galaxy/config/schemas/config_schema.yml"
+    block: |
+      {% filter indent(width=6, first=true) %}
+      list_cluster_directories_script:
+        type: str
+        required: false
+        desc: |
+          Allows the users who have terminal access to a cluster to browse the storage directories of this
+          cluster. These directories may be the user's home directory or the so called project storage
+          directories owned by a posix group of the project. The script lists the directories on behalf
+          of the user and only displays the content accessible for user's permissions. The browsed directory
+          must be mounted on the galaxy server!!
+
+          Example value 'sudo -E scripts/list_cluster_directories.py'
+      {% endfilter %}

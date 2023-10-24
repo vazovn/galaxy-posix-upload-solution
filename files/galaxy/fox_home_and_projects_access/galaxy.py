@@ -91,7 +91,7 @@ class UserHomeFilesSource(PosixFilesSource):
     def __init__(self, **kwd: Unpack[PosixFilesSourceProperties]):
         posix_kwds: PosixFilesSourceProperties = dict(
             id="_userhome",
-            root="/tmp/file_source_test/${user.username}/",
+            root="/fox-homes/${user.username}/",
             label="User Home Directory",
             doc="Galaxy User's Home Directory",
             writable=True,
@@ -106,14 +106,13 @@ class UserHomeFilesSource(PosixFilesSource):
         return "gxuserhome"
 
 
-
 class UserProjectFilesSource(PosixFilesSource):
     plugin_type = "gxuserprojects"
 
     def __init__(self, **kwd: Unpack[PosixFilesSourceProperties]):
         posix_kwds: PosixFilesSourceProperties = dict(
-	    id="_userprojects",
-            root="/tmp/file_source_test_projects/",
+            id="_userprojects",
+            root="/ec-projects01/",
             label="User Projects Directory",
             doc="Galaxy User's Projects Directory",
             writable=True,
