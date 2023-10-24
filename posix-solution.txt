@@ -140,5 +140,11 @@ SOLUTION: add
 - chown root:ec01-galaxy-group list_cluster_directories.py
 
 
+=================================================== 12 ==============================================================
+
+Mount homes and projects to the galaxy server /etc/fstab
+
+aspasia.ad.fp.educloud.no:/fp/homes01/        /ec-homes01              nfs ro,bg,hard,intr,tcp,nfsvers=3
+aspasia.ad.fp.educloud.no:/fp/projects01         /ec-projects01         nfs ro,bg,hard,intr,tcp,nfsvers=3
 
 

@@ -91,7 +91,7 @@ class UserHomeFilesSource(PosixFilesSource):
     def __init__(self, **kwd: Unpack[PosixFilesSourceProperties]):
         posix_kwds: PosixFilesSourceProperties = dict(
             id="_userhome",
-            root="/fox-homes/${user.username}/",
+            root="/ec-homes01/u01/${user.username}/",
             label="User Home Directory",
             doc="Galaxy User's Home Directory",
             writable=True,
