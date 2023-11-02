@@ -2,7 +2,7 @@ server {
 	listen 80 default_server;
 	listen [::]:80 default_server;
 
-	server_name galaxy01-test.educloud.no;
+	server_name galaxy01.educloud.no;
 
 	location / {
 		return 302 https://$host$request_uri;

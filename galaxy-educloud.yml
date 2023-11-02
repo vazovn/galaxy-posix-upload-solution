@@ -45,7 +45,7 @@
     - name: Change data folder ownership
       become: true
       become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data"
+      command: "{{ item }} chdir=/cluster/galaxy-data-prod"
       with_items:
       - chown -R ec-galaxy:ec01-galaxy-group compiled_templates
       - chown -R ec-galaxy:ec01-galaxy-group files
@@ -58,7 +58,7 @@
     - name: Change data folder mode
       become: true
       become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data"
+      command: "{{ item }} chdir=/cluster/galaxy-data-prod"
       with_items:
       - chmod -R 750 compiled_templates
       - chmod -R 730 files
@@ -74,7 +74,7 @@
     - name: Change ownership to scripts folder
       become: true
       become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
+      command: "{{ item }} chdir=/cluster/galaxy-data-prod/scripts/"
       with_items:
       - chown root:ec01-galaxy-group drmaa_external_runner.py
       - chown root:ec01-galaxy-group drmaa_external_killer.py
@@ -85,7 +85,7 @@
     - name: Set 500 to the permission escalating scripts used for real user setup
       become: true
       become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
+      command: "{{ item }} chdir=/cluster/galaxy-data-prod/scripts/"
       with_items:
       - chmod 500 drmaa_external_runner.py
       - chmod 500 drmaa_external_killer.py

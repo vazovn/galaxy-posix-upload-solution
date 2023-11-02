@@ -1,7 +1,7 @@
 
 These are the lines which manage the nginx conf:
 
-group_vars/galaxy01-test.educloud.yml
+group_vars/galaxy01.educloud.yml
 
 nginx_servers:
   - redirect-ssl

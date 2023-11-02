@@ -7,14 +7,14 @@
 - name: Delete existing directory
   file:
     state: absent
-    path: /cluster/galaxy-data/tools/prod/
+    path: /cluster/galaxy-data-prod/tools/prod/
 
 - name: Pull the tool directories from Sabry tool repo
   git:
     repo: https://nikolaiv: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@github.uio.no/IT-ITF/sw-portals-team-lifeportal-fox-tools.git
-    dest: "{{ tools_root }}" # /cluster/galaxy-data/tools/prod
+    dest: "{{ tools_root }}" # /cluster/galaxy-data-prod/tools/prod
     update: yes
-    version: galaxy-test
+    version: galaxy
     force: yes
   when:  tools_root is defined
 

@@ -25,9 +25,9 @@ are made in the role *lifeportal.customized* in *tasks/main.yml*. These changes 
 
 ## Slurm (for submit host)
 
-- copy all the _fox-slurm_ rpms from `/cluster/staff/slurm/20.11.8/`
+- copy all the _fox-slurm_ rpms from `/cluster/staff/slurm/20.11.8 or latest/`
 - install them : `yum localinstall fox-slurm-*`
-- copy all the `*.conf` files from  `/etc/slurm` in any fox login host
+- copy all the `*.conf` files from  `/var/spool/slurmd/conf-cache` from any fox login host to `/etc/slurm/` on the galaxy server
 - edit the value of `ControlMachine` in the file `/etc/slurm/slurm.conf` like this : `ControlMachine=los.fox.ad.fp.educloud.no`
 - install munge with yum
 - copy the `munge.key` file from any fox login node to `/etc/munge/` 
@@ -37,6 +37,8 @@ are made in the role *lifeportal.customized* in *tasks/main.yml*. These changes 
 		10.110.0.2	los los.fox
 		10.111.0.2	los-mgmt los-mgmt.fox
 		10.112.0.2	los-ib los-ib.fox
+
+- comment the line in
 
 
 ## Mounting of directories
@@ -67,9 +69,10 @@ The file will be inluded by the includedir statement in sudoers file
 
 	```
 	Defaults:ec-galaxy    !requiretty
-	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data/scripts/drmaa_external_runner.py
-	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data/scripts/drmaa_external_killer.py
-	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data/scripts/external_chown_script.py
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data-prod/scripts/drmaa_external_runner.py
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data-prod/scripts/drmaa_external_killer.py
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data-prod/scripts/external_chown_script.py
+	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data-prod/scripts/list_cluster_directories.py
 	ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /usr/bin/ls
 	```
 
@@ -135,7 +138,7 @@ The file will be inluded by the includedir statement in sudoers file
 
 	- name: Create the directory scripts for real user support if it does not exist
   	  ansible.builtin.file:
-    	     path: /cluster/galaxy-data/scripts
+    	     path: /cluster/galaxy-data-prod/scripts
     	     state: directory
     	     mode: '0730'
     	     group: "{{ galaxy_group_id }}"
@@ -149,14 +152,14 @@ The file will be inluded by the includedir statement in sudoers file
 
 	# SLURM DIR
 	- name: Check directory slurm
-  	  stat: path=/cluster/galaxy-data/slurm
+  	  stat: path=/cluster/galaxy-data-prod/slurm
   	  register: directory_slurm
 
 	- debug: var=directory_slurm.stat.path
 
 	- name: Create slurm directory if it doesn't already exist
   	  ansible.builtin.file:
-    	      path: /cluster/galaxy-data/slurm
+    	      path: /cluster/galaxy-data-prod/slurm
     	      state: directory
     	      mode: '0730'
     	      group: "{{ galaxy_group_id }}"
@@ -164,14 +167,14 @@ The file will be inluded by the includedir statement in sudoers file
 
 	# TMP DIR
 	- name: Check directory tmp
-  	  stat: path=/cluster/galaxy-data/tmp
+  	  stat: path=/cluster/galaxy-data-prod/tmp
   	  register: directory_tmp
 
 	- debug: var=directory_tmp.stat.path
 
 	- name: Create tmp directory if it doesn't already exist
   	  ansible.builtin.file:
-    	     path: /cluster/galaxy-data/tmp
+    	     path: /cluster/galaxy-data-prod/tmp
     	     state: directory
     	     mode: '0730'
     	     group: "{{ galaxy_group_id }}"
@@ -179,14 +182,14 @@ The file will be inluded by the includedir statement in sudoers file
 
 	# COMPILED TEMPLATES DIR
 	- name: Check directory compiled_templates
-  	  stat: path=/cluster/galaxy-data/compiled_templates
+  	  stat: path=/cluster/galaxy-data-prod/compiled_templates
   	  register: directory_compiled_templates
 
 	- debug: var=directory_compiled_templates.stat.path
 
 	- name: Create compiled_templates directory if it doesn't already exist
   	  ansible.builtin.file:
-    	    path: /cluster/galaxy-data/compiled_templates
+    	    path: /cluster/galaxy-data-prod/compiled_templates
     	    state: directory
     	    mode: '0730'
     	    group: "{{ galaxy_group_id }}"
@@ -201,7 +204,7 @@ The file will be inluded by the includedir statement in sudoers file
     - name: Change data folder ownership
       become: true
       become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data"
+      command: "{{ item }} chdir=/cluster/galaxy-data-prod"
       with_items:
       - chown -R ec-galaxy:ec01-galaxy-group compiled_templates
       - chown -R ec-galaxy:ec01-galaxy-group files
@@ -214,7 +217,7 @@ The file will be inluded by the includedir statement in sudoers file
     - name: Change data folder mode
       become: true
       become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data"
+      command: "{{ item }} chdir=/cluster/galaxy-data-prod"
       with_items:
       - chmod -R 750 compiled_templates
       - chmod -R 730 files
@@ -228,7 +231,7 @@ The file will be inluded by the includedir statement in sudoers file
     - name: Change ownership to scripts folder
       become: true
       become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
+      command: "{{ item }} chdir=/cluster/galaxy-data-prod/scripts/"
       with_items:
       - chown root:ec01-galaxy-group drmaa_external_runner.py
       - chown root:ec01-galaxy-group drmaa_external_killer.py
@@ -238,7 +241,7 @@ The file will be inluded by the includedir statement in sudoers file
     - name: Set 500 to the permission escalating scripts used for real user setup
       become: true
       become_user: root
-      command: "{{ item }} chdir=/cluster/galaxy-data/scripts/"
+      command: "{{ item }} chdir=/cluster/galaxy-data-prod/scripts/"
       with_items:
       - chmod 500 drmaa_external_runner.py
       - chmod 500 drmaa_external_killer.py
@@ -261,3 +264,27 @@ Then run the commands like
 etc.
 
 For more info see: *https://training.galaxyproject.org/training-material/topics/admin/tutorials/gxadmin/tutorial.html*
+
+
+## Mounts
+
+Partitions and access:
+
+	| ess-fp-proto01 /fp/fox01 # ls -ld galaxy*
+	| drwxr-s---  2 ec-galaxy ec01-galaxy-group 4096 Nov  2 10:23 galaxy
+	| drwxrws--x  2 ec-galaxy ec01-galaxy-group 4096 Nov  2 10:28 galaxy-data-prod
+	| drwxrws--x 10 ec-galaxy ec01-galaxy-group 4096 Nov  2 10:21 galaxy-data-test
+	| drwxr-x---  3 ec-galaxy ec01-galaxy-group 4096 Sep  7 15:01 galaxy-test
+
+Exports : RO/RW and (NO_)ROOT_SQUASH:
+
+	| Path                            Clients                        Access_Type  Protocols  Transports  Squash          SecType
+	| ------------------------------  -----------------------------  -----------  ---------  ----------  --------------  -------
+	| /fp/fox01/galaxy                galaxy01.educloud.no           RW           3          TCP         ROOT_SQUASH     SYS
+	| /fp/fox01/galaxy-data-prod      galaxy01.educloud.no           RW           3          TCP         NO_ROOT_SQUASH  SYS
+	| /fp/fox01/galaxy-data-test      galaxy01-test.educloud.no      RW           3          TCP         NO_ROOT_SQUASH  SYS
+	| /fp/fox01/galaxy-test           galaxy01-test.educloud.no      RW           3          TCP         ROOT_SQUASH     SYS
+	| /fp/homes01                     galaxy01-test.educloud.no      RO           3          TCP         ROOT_SQUASH     SYS
+	| /fp/homes01                     galaxy01.educloud.no           RO           3          TCP         ROOT_SQUASH     SYS
+	| /fp/projects01                  galaxy01-test.educloud.no      RO           3          TCP         ROOT_SQUASH     SYS
+	| /fp/projects01                  galaxy01.educloud.no           RO           3          TCP         ROOT_SQUASH     SYS

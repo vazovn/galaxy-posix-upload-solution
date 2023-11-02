@@ -56,7 +56,7 @@ Please mind `http` and `https`.
     <provider name="LifeportalFox">
         <client_id>CLIENT_ID</client_id>
         <client_secret>CLIENT_SECRET</client_secret>
-        <redirect_uri>https://galaxy-test.educloud.no/authnz/lifeportalfox/callback</redirect_uri>
+        <redirect_uri>https://galaxy.educloud.no/authnz/lifeportalfox/callback</redirect_uri>
         <prompt>consent</prompt>
         <icon>https://www.usit.uio.no/bilder/fox_man2.png?vrtx=thumbnail</icon>
         <!-- (Optional) Extra scopes you need to request for your implementation -->

@@ -10,10 +10,10 @@ import sys
 # script is removed by the admin.
 #
 
-ALLOWED_PATHS = [ "/cluster/galaxy-data/jobs_directory",
-                  "/cluster/galaxy-data/tmp",
-                  "/cluster/galaxy-data/files",
-                  "/cluster/galaxy-data/scripts"
+ALLOWED_PATHS = [ "/cluster/galaxy-data-prod/jobs_directory",
+                  "/cluster/galaxy-data-prod/tmp",
+                  "/cluster/galaxy-data-prod/files",
+                  "/cluster/galaxy-data-prod/scripts"
                 ]
 
 #ALLOWED_PATHS = None

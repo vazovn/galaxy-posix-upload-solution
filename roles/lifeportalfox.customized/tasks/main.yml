@@ -38,7 +38,7 @@
   when: galaxy_use_tunnel
 
 - name: Run make client again after Modify LoginForm vue file and Modify Makefile
-  shell: "source  /cluster/galaxy-test/srv/galaxy/venv/bin/activate && cd /cluster/galaxy-test/srv/galaxy/server && npm update caniuse-lite browserslist  && /usr/bin/make client"
+  shell: "source  /cluster/galaxy/srv/galaxy/venv/bin/activate && cd /cluster/galaxy/srv/galaxy/server && npm update caniuse-lite browserslist  && /usr/bin/make client"
 
 ## === This task will be used to install tools  === ##
 - name: Make the lifeportal fox tool directories
@@ -86,7 +86,7 @@
 
 ## Delete 7 lines after line containing JOB_RESOURCE_CONDITIONAL_XML
 - name: Edit  JOB_RESOURCE_CONDITIONAL_XML  in jobs_init_py 
-  shell: "/usr/bin/sed -i.bak -e '/JOB_RESOURCE_CONDITIONAL_XML = \"\"\"<conditional name=\"__job_resource\"/,+7d' /cluster/galaxy-test/srv/galaxy/server/lib/galaxy/jobs/__init__.py"
+  shell: "/usr/bin/sed -i.bak -e '/JOB_RESOURCE_CONDITIONAL_XML = \"\"\"<conditional name=\"__job_resource\"/,+7d' /cluster/galaxy/srv/galaxy/server/lib/galaxy/jobs/__init__.py"
 
 ## Set the new values to JOB_RESOURCE_CONDITIONAL_XML
 - name: Insert correct order of job parameteres in jobs_init_py 

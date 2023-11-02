@@ -10,7 +10,7 @@ Set the variable list_cluster_directories_script
 
 a)
 # -- Enable listing of cluster directories as real user ----------------------------------------
-list_cluster_directories_script: "sudo -E /cluster/galaxy-data/scripts/list_cluster_directories.py"
+list_cluster_directories_script: "sudo -E /cluster/galaxy-data-prod/scripts/list_cluster_directories.py"
 
 b)
 galaxy_scripts_files:
@@ -122,12 +122,12 @@ Edit the galaxy sudoers file /etc/sudoers.d/ec-galaxy
 
 SOLUTION: add line
 
-ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data/scripts/list_cluster_directories.py
+ec-galaxy  ALL = (root) NOPASSWD: SETENV:  /cluster/galaxy-data-prod/scripts/list_cluster_directories.py
 
 
 =================================================== 10 ==============================================================
 
-Create the list_cluster_directories.py itself and put it into /scripts/ (/cluster/galaxy-data/scripts)
+Create the list_cluster_directories.py itself and put it into /scripts/ (/cluster/galaxy-data-prod/scripts)
 
 SOLUTION: copy new file from ansible /files/galaxy/scripts
 

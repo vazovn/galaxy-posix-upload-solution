@@ -7,7 +7,7 @@ install drmaa python package (this is automated in the ansible script, galaxy-ed
 
 2 == THIS IS NECESSARY FIX
 edit
-/cluster/galaxy-test/srv/galaxy/venv/lib64/python3.11/site-packages/routes/__init__.py
+/cluster/galaxy/srv/galaxy/venv/lib64/python3.11/site-packages/routes/__init__.py
 l.73 change
 self.__shared_state.host += ':' + environ['SERVER_PORT']
 to
@@ -47,7 +47,7 @@ def get_system_sitepackages():
 
 4 == THIS IS A TEMPORARY SOLUTION TO AVOID THE REFRESH TOKEN ERROR
 
-[ec-galaxy@galaxy01-test authnz]$ cat managers.py.diff
+[ec-galaxy@galaxy01 authnz]$ cat managers.py.diff
 
 340,342d339
 <         # Nikolay temporary fix
@@ -57,7 +57,7 @@ def get_system_sitepackages():
 
 5 ==
 
-Check if 'chmod g+s' is set for /cluster/galaxy-data/{files,jobs_directory}
+Check if 'chmod g+s' is set for /cluster/galaxy-data-prod/{files,jobs_directory}
 This must be set in galaxy-educloud.yml playbook file
 
 6 ==
