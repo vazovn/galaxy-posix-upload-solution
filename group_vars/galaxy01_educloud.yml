@@ -12,7 +12,7 @@ galaxy_separate_privileges: true
 galaxy_manage_paths: true
 galaxy_layout: root-dir
 galaxy_root: /cluster/galaxy/srv/galaxy
-galaxy_virtualenv_command: "{{ miniconda_prefix }}/envs/_galaxy_/bin/virtualenv"
+galaxy_virtualenv_command: "{{ miniconda_prefix }}/envs/_galaxy_/bin/virtualenv -p {{ miniconda_prefix }}/envs/_galaxy_/bin/python3.11"
 
 galaxy_user: {name: "{{ galaxy_user_name }}", shell: /bin/bash, uid: 2100096}
 galaxy_privsep_user: "{{ galaxy_user_name }}"
@@ -70,7 +70,7 @@ visualization_plugins_directory: "{{ galaxy_root }}/server/config/plugins/visual
 
 ## -- Miniconda needed for cross-platform copy of Python and Galaxy's venv -- ##
 # All other settings are in galaxyproject.miniconda role : defaults/main.yml
-miniconda_prefix: "{{ tool_dependency_dir }}/_conda"
+miniconda_prefix: "/cluster/galaxy/_conda"
 
 # Source and target file directories for oidc backends
 galaxy_oidc_backend_files_src_dir: files/galaxypython3.11/oidc_files/
@@ -131,7 +131,8 @@ galaxy_config:
 # -- Enable listing of cluster directories as real user ----------------------------------------
     list_cluster_directories_script: "sudo -E {{ galaxy_scripts_dir }}/list_cluster_directories.py"
 
-# -- Cluster partition based directories -----------------------------
+# -- Cluster partition based directories -----------------------------./roles/galaxyproject.galaxy/vars/layout-root-dir.yml:__galaxy_venv_dir: "{{ galaxy_root }}/venv"
+
     file_path: "{{ galaxy_lifeportal_data_dir }}/files"
     new_file_path: "{{ galaxy_lifeportal_data_dir }}/tmp"
     template_cache_path: "{{ galaxy_lifeportal_data_dir }}/compiled_templates"
@@ -156,6 +157,7 @@ galaxy_config:
 
 # -- Run jobs as real user setup ----------------------------------------
     outputs_to_working_directory: true
+
     real_system_username: username
     ## Check that the two following lines are not spread on two consecutive lines""
     drmaa_external_runjob_script: "sudo -E DRMAA_LIBRARY_PATH=/drmaa/lib/libdrmaa.so.1  {{ galaxy_scripts_dir }}/drmaa_external_runner.py --assign_all_groups"

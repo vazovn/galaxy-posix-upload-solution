@@ -45,6 +45,16 @@
      - role: galaxyproject.miniconda
        become: true
        become_user: "{{ galaxy_user_name }}"
+       vars:
+           galaxy_conda_create_env: true
+           galaxy_conda_env: _galaxy_
+           galaxy_conda_env_channels:
+               - conda-forge
+               - defaults
+           galaxy_conda_env_packages:
+               - python=3.11
+               - pip>=23.1
+               - virtualenv>=16
      - role: galaxyproject.galaxy
        become: true
        become_user: "{{ galaxy_user_name }}"
