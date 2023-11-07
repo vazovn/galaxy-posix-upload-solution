@@ -6,6 +6,10 @@
        - bison.x86_64
        - ragel-devel.x86_64
        - ragel.x86_64
+       - gperf.x86_64
+       - gperftools-devel.x86_64
+       - gperftools-libs.x86_64
+       - gperftools.x86_64
     state: present
 
 - name: Copy slurm-drmaa source

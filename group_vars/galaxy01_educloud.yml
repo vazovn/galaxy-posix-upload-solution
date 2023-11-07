@@ -1,7 +1,8 @@
 ---
 
 # Python3 support
-pip_virtualenv_command: /usr/bin/python3 -m virtualenv --copies
+#pip_virtualenv_command: /bin/python3.11 -m venv --copies
+pip_virtualenv_command: "{{ miniconda_prefix }}/envs/_galaxy_/bin/python3.11 -m venv --copies"
 
 # Galaxy
 
@@ -66,8 +67,12 @@ tool_search_index_dir: "{{ galaxy_root }}/var/cache/tool_search_index"
 ucsc_build_sites: "{{ galaxy_root }}/server/tool-data/shared/ucsc/ucsc_build_sites.txt.sample"
 visualization_plugins_directory: "{{ galaxy_root }}/server/config/plugins/visualizations"
 
+## -- Miniconda needed for cross-platform copy of Python and Galaxy's venv -- ##
+# All other settings are in galaxyproject.miniconda role : defaults/main.yml
+miniconda_prefix: "{{ tool_dependency_dir }}/_conda"
+
 # Source and target file directories for oidc backends
-galaxy_oidc_backend_files_src_dir: files/galaxy/oidc_files/
+galaxy_oidc_backend_files_src_dir: files/galaxypython3.11/oidc_files/
 galaxy_oidc_backend_files_target_dir: "{{ galaxy_venv_dir }}/lib/python3.11/site-packages/social_core/backends/"
 
 # Paths to real user setup files

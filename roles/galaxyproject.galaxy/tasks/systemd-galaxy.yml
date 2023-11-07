@@ -15,6 +15,7 @@
         group: "{{ galaxy_systemd_root | ternary('root', __galaxy_user_group) }}"
         mode: 0644
         src: systemd/galaxy.service.j2
+        ## the directory /home/ec-galaxy/.config/systemd/user must be created manually!!!
         dest: "{{ galaxy_systemd_root | ternary('/etc/systemd/system/', ('~' ~ __galaxy_user_name ~ '/.config/systemd/user') | expanduser) }}/galaxy.service"
       notify:
         - systemd daemon reload

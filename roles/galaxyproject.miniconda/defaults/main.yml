@@ -35,15 +35,15 @@ miniconda_base_env_packages: []
 miniconda_conda_environments: {}
 
 # Automatically create a conda env using virtualenv from conda-forge for Galaxy (https://galaxyproject.org/)
-galaxy_conda_create_env: false
+galaxy_conda_create_env: true
 galaxy_conda_env: _galaxy_
 galaxy_conda_env_channels:
   - conda-forge
   - defaults
 galaxy_conda_env_packages:
-  - python=3.6
-  - pip>=9
-  - virtualenv>=16
+  - python=3.11
+  - pip>=21
+  - virtualenv>=20
 
 # You generally should not need to set these yourself
 #

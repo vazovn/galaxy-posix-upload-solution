@@ -24,7 +24,7 @@
   when: galaxy_manage_static_setup
 
 ## The following task is necessary only when the host has no connection to the outside world!!
-## Activate 'galaxy_use_tunnel' in the group_vars/galaxy01_educloud_test.yml
+## Activate 'galaxy_use_tunnel' in the group_vars/galaxy01_educloud.yml
 - name: Modify Makefile in galaxy server directory
   lineinfile:
     path: "{{ galaxy_server_dir }}/Makefile"
