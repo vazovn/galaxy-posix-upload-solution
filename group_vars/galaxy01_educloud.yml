@@ -12,6 +12,7 @@ galaxy_separate_privileges: true
 galaxy_manage_paths: true
 galaxy_layout: root-dir
 galaxy_root: /cluster/galaxy/srv/galaxy
+galaxy_virtualenv_command: {{ miniconda_prefix }}/envs/_galaxy_/bin/virtualenv
 
 galaxy_user: {name: "{{ galaxy_user_name }}", shell: /bin/bash, uid: 2100096}
 galaxy_privsep_user: "{{ galaxy_user_name }}"
