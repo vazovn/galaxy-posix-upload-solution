@@ -25,7 +25,7 @@
   pre_tasks:
     - name: Install Dependencies
       package:
-        name: ['acl', 'bzip2', 'git', 'make', 'python3-psycopg2', 'tar', 'python3-virtualenv', 'python3-setuptools']
+        name: ['acl', 'bzip2', 'git', 'make', 'python3-psycopg2', 'tar', 'python3-virtualenv', 'python3-setuptools', 'python3.11',  'python3-pip.noarch']
     - name: Enable or reenable linger for ec-galaxy user (needed for user systemd setup)
       shell:
             "if [[ $(loginctl list-users | grep 'ec-galaxy') == *2100096* ]]; then loginctl disable-linger ec-galaxy && sleep 5 && loginctl enable-linger ec-galaxy; else loginctl enable-linger ec-galaxy; fi"
@@ -40,6 +40,13 @@
       ansible.builtin.yum:
          name: "@Development tools"
          state: present
+    - name: Create the directory gunicorn
+      file:
+          path: /gunicorn
+          owner: "{{ galaxy_user_name }}"
+          group: "{{ galaxy_user_group }}"
+          mode: 0755
+          state: directory
 
   roles:
      - role: galaxyproject.miniconda
@@ -65,9 +72,9 @@
      - role: galaxyproject.nginx
        become: yes
        become_user: root
-     # - role: slurmdrmaa.galaxy
-     #   become: yes
-     #   become_user: root
+     - role: slurmdrmaa.galaxy
+       become: yes
+       become_user: root
      - role: galaxyproject.gxadmin
 
   post_tasks:

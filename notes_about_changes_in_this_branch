@@ -1,0 +1,211 @@
+
+1. Jeg har sett endringene i branchen vault_secrets. Dry run viste at alt er i orden. Men galaxy kjører ikke og jeg bestemte å ikke merge dem til main enda.
+
+2. Jeg brukte en vault fil som heter secrets.txt.
+
+[nikolaiv@markov galaxy-fox]$ ansible-vault view secrets.txt
+Vault password:
+galaxy01_educloud_test_server_sudo_pass: <MIN-PASS>
+client_secret: "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2ODc5YTQ5ZS1lZDYwLTQ4ZTktOTVlMS1mMGFlYTY4OTg5ZmUiLCJleHAiOjE2ODQ4MzgwNDYsIm5vbmNlIjoiY25yUGhrcVFyTFUifQ.Xump3zuHxkWmCEEmPA2BsQbDlEoBrUMBvWHCwZacozs"
+client_id: "6879a49e-ed60-48e9-95e1-f0aea68989fe"
+
+Hvis du vil, du kan gjenbruke filen, bare set ditt passord i stedet for <MIN-PASS>
+
+Egentlig, for å skape filen gjorde jeg den følgende
+
+- kjørte 'ansible-vault create secrets.txt'
+- valgte et passord
+- sat i filen de tre linijene med 'galaxy01_educloud_test_server_sudo_pass' fylt ut
+
+Pass på doble quotes, ansible feiler med enkle (tok 20 min for å finne ut)
+
+
+3. Jeg har den folgende linje i min hosts filen
+
+[galaxy01_educloud_test:vars]
+...
+ansible_become_pass="{{ galaxy01_educloud_test_server_sudo_pass }}"
+
+
+4. For å kjøre alt bruker jeg :
+
+dry run
+ansible-playbook -i ./hosts  --ask-vault-pass --extra-vars '@secrets.txt'   galaxy-educloud.yml -vv --check
+ekte run
+ansible-playbook -i ./hosts  --ask-vault-pass --extra-vars '@secrets.txt'   galaxy-educloud.yml -vv
+
+
+
+
+=================================  FIXES FOR el9 =====================
+
+1 DONE in galaxy-educloud.yml
+as root in galaxy01.educloud.no
+dnf install python3.11
+dnf install python3-pip.noarch
+
+2 DONE
+set
+pip_virtualenv_command: "{{ miniconda_prefix }}/envs/_galaxy_/bin/python3.11 -m venv --copies"
+galaxy_virtualenv_command: "{{ miniconda_prefix }}/envs/_galaxy_/bin/virtualenv -p {{ miniconda_prefix }}/envs/_galaxy_/bin/python3.11"
+in files all.yml and galaxy01_educloud.yml
+
+3 DONE
+DB issues 1
+edit galaxy_educloud.yml
+add a new hosts block
+- hosts: dbservers
+you actually move the postgresql role out of the host galaxy01.educloud
+see the file!!
+
+4 DONE
+DB issues 2
+edit hosts - add the following block for host dbservers (put your values)
+
+===========================
+[dbservers]
+galaxy01.educloud.no
+
+[dbservers:vars]
+ansible_connection=ssh
+ansible_ssh_private_key_file="/uio/kant/usit-ft-u1/nikolaiv/lifeportal-fox-test/keys/galax01_rsa"
+become=yes
+become_user=root
+ansible_user=ec-nikolaiv
+ansible_become_method=sudo
+ansible_become_pass="{{ galaxy01_educloud_prod_server_sudo_pass }}"
+ansible_python_interpreter=/bin/python3
+===========================
+
+5 DONE (if needed)
+extend the /home on the VM
+[root@galaxy01 home]# lvextend -L+10G /dev/mapper/internvg-home
+[root@galaxy01 home]# xfs_growfs /dev/mapper/internvg-home
+otherwise it crashes when building the client
+
+6 DONE (if needed to be run as the (ec-)galaxy user)
+create the directory /home/ec-galaxy/.config/systemd/user manually if you want to
+run the galaxy.service as the user ec-galaxy!!
+edit -bashrc as follows
+export XDG_RUNTIME_DIR=/run/user/2100096
+and source after login as ec-galaxy
+
+7 DONE
+Install devtools
+dnf groupinstall "Development Tools
+
+in galaxy-educloud.yml in pre-tasks
+======
+    - name: Install the 'Development tools' package group
+      ansible.builtin.yum:
+         name: "@Development tools"
+         state: present
+======
+
+8 DONE
+for slurm-drmaa
+dnf install gperf.x86_64 gperftools-devel.x86_64 gperftools-libs.x86_64 gperftools.x86_64
+
+9. DONE To put into an ansible role
+from /tmp on galaxy01.educloud.no
+
+ 1342  2023-11-03T14:26:34  git clone https://github.com/natefoo/slurm-drmaa.git slurm-drmaa-nate
+ 1344  2023-11-03T14:26:40  cd slurm-drmaa-nate/
+ 1347  2023-11-03T14:26:51  rm -rf drmaa_utils/
+ 1360  2023-11-03T14:29:21  git clone https://github.com/natefoo/drmaa-utils.git drmaa_utils
+ 1361  2023-11-03T14:29:24  cd drmaa_utils/
+ 1362  2023-11-03T14:29:25  ls
+ 1363  2023-11-03T14:29:31  chmod +x *.sh
+ 1364  2023-11-03T14:29:37  ./autogen.sh
+ 1365  2023-11-03T14:30:18  ./configure --with-slurm-inc=/usr/include --with-slurm-lib=/usr/lib64/ --prefix=/drmaa_utils/ --enable-debug
+ 1366  2023-11-03T14:30:28  make
+ 1367  2023-11-03T14:30:39  make install
+ 1368  2023-11-03T14:30:44  cd .. (to /tmp/slurm-drmaa-nate)
+ 1369  2023-11-03T14:30:44  ls
+ 1370  2023-11-03T14:30:50  ./autogen.sh
+ 1371  2023-11-03T14:31:20  ./configure --with-slurm-inc=/usr/include --with-slurm-lib=/usr/lib64/ --prefix=/drmaa --enable-debug
+ 1372  2023-11-03T14:35:36  make
+ 1373  2023-11-03T14:35:47  make install
+
+
+10. DONE To put into an ansible task
+Create /gunicorn directory
+[root@galaxy01 ~]# chown -R ec-galaxy:ec01-galaxy-group  /gunicorn
+[root@galaxy01 ~]# chmod -R 755  /gunicorn
+
+11.
+if 502 bad gateway and error message "gunicorn.sock failed (13: Permission denied) while connecting to upstream"
+this is SELINUX !!
+setsebool -P httpd_can_network_connect 1
+sudo cat /var/log/audit/audit.log | grep nginx | grep denied
+sudo cat /var/log/audit/audit.log | grep nginx | grep denied | audit2allow -M mynginx
+sudo semodule -i mynginx.pp
+
+12 DONE Committed to the base galaxy code
+STRING vs INTEGER bug
+change environ['SERVER_PORT'] to str(environ['SERVER_PORT'])
+in
+/cluster/galaxy/srv/galaxy/venv/lib64/python3.11/site-packages/routes/__init__.py
+/cluster/galaxy/srv/galaxy/venv/lib64/python3.11/site-packages/paste/request.py
+This was fixed by Nicola Soranzo in
+/cluster/galaxy/srv/galaxy/server/lib/galaxy/web/framework/base.py
+by
+=======
+diff --git a/lib/galaxy/web/framework/base.py b/lib/galaxy/web/framework/base.py
+index fef6c377cc..70b5bb769e 100644
+--- a/lib/galaxy/web/framework/base.py
++++ b/lib/galaxy/web/framework/base.py
+@@ -222,6 +222,12 @@ class WebApplication:
+         rc = routes.request_config()
+         rc.mapper = self.mapper
+         rc.mapper_dict = map_match
++        server_port = environ["SERVER_PORT"]
++        if isinstance(server_port, int):
++            # Workaround bug in the routes package, which would concatenate this
++            # without casting to str in
++            # https://github.com/bbangert/routes/blob/c4d5a5fb693ce8dc7cf5dbc591861acfc49d5c23/routes/__init__.py#L73
++            environ["SERVER_PORT"] = str(server_port)
+         rc.environ = environ
+         # Setup the transaction
+         trans = self.transaction_factory(environ)
+===
+committed to 23.1 !!!
+
+13. TEMP SOLUTION
+Remove the error message for not refreshed token
+file ../lib/galaxy/authnz/managers.py , method 'refresh_expiring_oidc_tokens_for_provider'
+Add the block below right after the method name
+<         # Nikolay temporary fix
+<         log.debug(f" ==== DEACTIVATE refresh_expiring_oidc_tokens ../authnz/managers.py ============= %s ", auth)
+<         return
+
+
+14.
+Edit the lifeportal_job_conf.yml : branches galaxy-prod and galaxy-test
+environments:
+      local_env:
+        runner: local_runner
+        tmp_dir: true
+
+== this
+      slurm_upload:
+        runner: slurm
+        native_specification: '--time=02:00:00 --nodes=1 --account=ec73 --mem-per-cpu=4096'
+== this
+
+      real_user_cluster:
+      # The drmaa runner can be used to run jobs as the submitting user,
+      # make sure to setup 3 real user parameters in galaxy.yml.
+        runner: slurm
+      generate_slurm_job_params:
+        runner: dynamic
+        function: integrate_job_destination_params
+        type: python
+tools:
+
+== this
+- id: upload1
+  environment: slurm_upload
+- id: __DATA_FETCH__
+  environment: slurm_upload
+== this

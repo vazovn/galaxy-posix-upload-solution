@@ -79,7 +79,7 @@ The file will be inluded by the includedir statement in sudoers file
 
 ## Edit the file
 
-	group_vars/galaxy01_educloud_test.yml
+	group_vars/galaxy01_educloud.yml
 
 1. add block (inside `galaxy_config.galaxy`)
 

@@ -15,6 +15,7 @@ galaxy_root: /cluster/galaxy/srv/galaxy
 galaxy_virtualenv_command: "{{ miniconda_prefix }}/envs/_galaxy_/bin/virtualenv -p {{ miniconda_prefix }}/envs/_galaxy_/bin/python3.11"
 
 galaxy_user: {name: "{{ galaxy_user_name }}", shell: /bin/bash, uid: 2100096}
+galaxy_user_group: "ec01-galaxy-group"
 galaxy_privsep_user: "{{ galaxy_user_name }}"
 
 galaxy_commit_id: release_23.1

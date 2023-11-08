@@ -12,44 +12,56 @@
        - gperftools.x86_64
     state: present
 
-- name: Copy slurm-drmaa source
-  copy:
-    src: "{{ role_path }}/files/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz"
-    dest: /tmp/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz
-    mode: ugo+rw
-    owner: "{{ galaxy_user_name }}"
-    group: "{{ galaxy_group }}"
-    
-- name: Copy slurm-drmaa conf
-  copy:
-    src: "{{ role_path }}/files/slurm_drmaa.conf"
-    dest: /etc/slurm_drmaa.conf
-    mode: ugo+rwx
-    owner: root
-    group: root
+- name: Clone slurm-drmaa repo
+  ansible.builtin.git:
+    repo: https://github.com/natefoo/slurm-drmaa.git
+    dest: /tmp/slurm-drmaa-nate
 
-- name: unzip slurm-drmaa
-  unarchive:
-      src: "/tmp/slurm-drmaa-{{ slurm_drmaa_version }}.tar.gz"
-      dest: "/tmp"
-      owner: "{{ galaxy_user_name }}"
-      remote_src: yes
-      mode: 01777
-    
-- name: Running ./configure for slurm-drmaa
-  shell:  ./configure --with-slurm-inc=/usr/include --with-slurm-lib=/usr/lib64/ --prefix=/drmaa/ --enable-debug
+- name: Clone drmaa_utils repo
+  ansible.builtin.git:
+    repo: https://github.com/natefoo/drmaa-utils.git
+    dest: /tmp/drmaa_utils
+
+### Fix drmaa_utils
+
+- name: Replace the empty drmaa_utils from the first clone
+  shell:  "rm -rf /tmp/slurm-drmaa-nate/drmaa_utils && mv /tmp/drmaa_utils/ /tmp/slurm-drmaa-nate/"
+  become: yes
+  become_user: root
+
+- name: Configure drmaa_utils
+  shell: "chmod +x *.sh && ./autogen.sh && ./configure --with-slurm-inc=/usr/include --with-slurm-lib=/usr/lib64/ --prefix=/drmaa_utils/ --enable-debug"
   args:
-    chdir: "/tmp/slurm-drmaa-{{ slurm_drmaa_version }}"
-  environment:
-    LD_LIBRARY_PATH: '$LD_LIBRARY_PATH:/usr/lib64'
-    CXXFLAGS: "-g -00"
+    chdir: "/tmp/slurm-drmaa-nate/drmaa_utils"
   become: yes
-  become_user: "{{ galaxy_user_name }}"
-    
+  become_user: root
+
+- name: Running "make" for drmaa_utils
+  command: 'make chdir=/tmp/slurm-drmaa-nate/drmaa_utils'
+  become: yes
+  become_user: root
+
+- name: Running "make install" for drmaa_utils
+  command: 'make install chdir=/tmp/slurm-drmaa-nate/drmaa_utils'
+  become: yes
+  become_user: root
+
+
+## Fix slurm-drmaa
+
+- name: Configure slurm-drmaa
+  shell: "chmod +x *.sh && ./autogen.sh && ./configure --with-slurm-inc=/usr/include --with-slurm-lib=/usr/lib64/ --prefix=/drmaa --enable-debug"
+  args:
+    chdir: "/tmp/slurm-drmaa-nate/"
+  become: yes
+  become_user: root
+
 - name: Running "make" for slurm-drmaa
-  command: 'make chdir=/tmp/slurm-drmaa-{{ slurm_drmaa_version }}'
+  command: 'make chdir=/tmp/slurm-drmaa-nate'
   become: yes
-  become_user: "{{ galaxy_user_name }}"
+  become_user: root
 
 - name: Running "make install" for slurm-drmaa
-  command: 'make install chdir=/tmp/slurm-drmaa-{{ slurm_drmaa_version }}'
+  command: 'make install chdir=/tmp/slurm-drmaa-nate'
+  become: yes
+  become_user: root
