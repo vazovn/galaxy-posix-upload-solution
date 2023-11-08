@@ -6,8 +6,8 @@
 [nikolaiv@markov galaxy-fox]$ ansible-vault view secrets.txt
 Vault password:
 galaxy01_educloud_test_server_sudo_pass: <MIN-PASS>
-client_secret: "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2ODc5YTQ5ZS1lZDYwLTQ4ZTktOTVlMS1mMGFlYTY4OTg5ZmUiLCJleHAiOjE2ODQ4MzgwNDYsIm5vbmNlIjoiY25yUGhrcVFyTFUifQ.Xump3zuHxkWmCEEmPA2BsQbDlEoBrUMBvWHCwZacozs"
-client_id: "6879a49e-ed60-48e9-95e1-f0aea68989fe"
+client_secret: 
+client_id: 
 
 Hvis du vil, du kan gjenbruke filen, bare set ditt passord i stedet for <MIN-PASS>
 
